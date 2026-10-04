@@ -1,0 +1,6 @@
+.android-certs/
+*.pk8
+*.x509.pem
+vendor/lineage-priv/
+out/
+*.zip

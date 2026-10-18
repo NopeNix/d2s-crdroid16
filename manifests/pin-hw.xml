@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pin lineage hw deps to deuspivete-era (crDroid 16.0 v12.9, built 2026-04-26)
+     lineage-23.2 states, so module names (HIDL @1.0 services etc.) match the
+     crDroid d2s/exynos9820-common device trees. Committed pins, not moving branches. -->
+<manifest>
+  <remove-project name="LineageOS/android_hardware_samsung" />
+  <project name="LineageOS/android_hardware_samsung" path="hardware/samsung" revision="7eda6c8a7519625b0a39c985db62c7daa638cbb8" />
+  <remove-project name="LineageOS/android_hardware_lineage_interfaces" />
+  <project name="LineageOS/android_hardware_lineage_interfaces" path="hardware/lineage/interfaces" revision="e59aaa7ab4915d3087a4ed29f73991c91c5697f3" />
+  <remove-project name="LineageOS/android_hardware_lineage_compat" />
+  <project name="LineageOS/android_hardware_lineage_compat" path="hardware/lineage/compat" revision="98b61d00a7a414bf1e2e10577e5023874554c763" />
+  <remove-project name="LineageOS/android_device_samsung_slsi_sepolicy" />
+  <project name="LineageOS/android_device_samsung_slsi_sepolicy" path="device/samsung_slsi/sepolicy" revision="499275821ee4c96d7fbf5b4662ea43c764bc8728" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_config" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_config" path="hardware/samsung_slsi-linaro/config" revision="fa6c5de5e721d294e0c9ae9e9aa0e5b3f661b7a6" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_exynos" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_exynos" path="hardware/samsung_slsi-linaro/exynos" revision="7cbe68fa3b422c07f7935ed35d2cdabd2f3fc0d2" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_exynos5" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_exynos5" path="hardware/samsung_slsi-linaro/exynos5" revision="7a7c982313e0821898ef9c696d3e12da95cfe037" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_graphics" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_graphics" path="hardware/samsung_slsi-linaro/graphics" revision="dece8a02e875fdac5ed470b47e5b477a2797dca0" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_interfaces" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_interfaces" path="hardware/samsung_slsi-linaro/interfaces" revision="aa39734cbeb5ea14a28c170ac7b4527942b703a0" />
+  <remove-project name="LineageOS/android_hardware_samsung_slsi-linaro_openmax" />
+  <project name="LineageOS/android_hardware_samsung_slsi-linaro_openmax" path="hardware/samsung_slsi-linaro/openmax" revision="15ab30812af9fe39fff2ae3cd867d7e954c73881" />
+</manifest>

@@ -1,6 +1,5 @@
-# Nopenix local manifest for crDroid 16.0 / d2s (Galaxy Note10+ SM-N975F)
+<!-- Nopenix local manifest for crDroid 16.0 / d2s (Galaxy Note10+ SM-N975F)
 
-<!--
 Usage: place as .repo/local_manifests/nopenix.xml after
   repo init -u https://github.com/crdroidandroid/android.git -b 16.0
 This file supplies everything the crDroid manifest does NOT include for d2s:

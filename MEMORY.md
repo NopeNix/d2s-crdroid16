@@ -4,6 +4,48 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-20 — FLASH-DAY STATUS (end of session, READ THIS FIRST): Phone = user's
+  personal daily driver SM-N975F (d2s), serial RF8MC0SAXCJ. Sequence so far: (1) built
+  signed OTA + recovery, (2) user flashed our recovery — WORKED, (3) sideloaded our
+  signed OTA — BOOTLOOP, (4) root cause IDENTIFIED from last_kmsg: 'reboot,netbpfload-missing'
+  — netbpfload binary lives in com.android.tethering APEX (capex present in build) but
+  apexd FAILED to decompress apexes into /data/apex/* because /data still held crDroid
+  12.9's OLD encrypted userdata (FBE keys mismatch with our 16.0 build). NOT a kernel or
+  vendor issue. (5) FIX APPLIED: TWRP 'twrp format data' executed successfully over adb,
+  (6) user was rebooting recovery to remount /data when USB dropped (phone physically
+  dropped, cable disconnected). NEXT SESSION MUST: adb connect, confirm recovery/TWRP,
+  then adb sideload /srv/android/flash-day/Nopenix-signed-ota.zip (md5 82f4477c...),
+  then reboot and watch first boot. If still bootloops: pull /proc/last_kmsg + pstore,
+  check netbpfload/apexd again. Fallback: TWRP restore of user's 12.9 backup.
+- 2026-10-20 — TWRP is on the phone now (user installed it; shows as omni_d2s, kernel
+  4.14.113-g55f042627, TWRP 'twrp' CLI works over adb: 'twrp format data' etc). TWRP
+  recovery identifies as 'recovery' in adb devices. heimdall NOT usable simultaneously
+  (device must be in download mode for heimdall, recovery for adb).
+- 2026-10-20 — Flash-day artifacts live in /srv/android/flash-day/: Nopenix-signed-ota.zip
+  (1.52GB, md5 82f4477ce628df6e553544e48c868270), Nopenix-recovery-signed.img (67MB, md5
+  a9be748e6dedf7e7822d0e4ffb9b176c), pit/d2s.pit (device partition table backup - KEEP!).
+  User's TWRP backup of 12.9 exists on their side (they confirmed making it).
+- 2026-10-20 — adb/heimdall installed on host: apt adb fastboot heimdall-flash; udev rule
+  /etc/udev/rules.d/51-android.rules for vendor 04e8+18d1. USB passthrough to this KVM
+  guest WORKS (user physical cable -> host -> guest). Phone appears as 04e8:6860 (MTP/adb)
+  or 04e8:685d (download mode). Sometimes needs cable replug to re-enumerate.
+- 2026-10-20 — Stock firmware download attempts ALL BLOCKED from this datacenter IP:
+  samfw.com (403), sourceforge (403), samsung FOTA fota-cloud-dn.ospserver.net (403),
+  samsung-firmware.org (DNS fail). Samsung FUS API (neofussvr.sslcs.cdngc.net) WORKS for
+  nonce+inform but returns Status 401 (auth rejected) on NF_DownloadBinaryInform —
+  Frija-style auth (plain nonce + make_signature + logic_check) tried ~8 variants incl.
+  correct SESSION cookie; likely requires IMEI-registered device_id or newer FUS protocol.
+  NOT NEEDED anyway: our own signed OTA zip IS the base image (contains full
+  system/vendor/product .new.dat.br images). TWRP format data + sideload = clean install.
+- 2026-10-20 — nanosamfw tool cloned to /tmp/nanosamfw (python FUS client), patched
+  fus/crypto.py (Cryptodome instead of Crypto, latin-1 nonce fallback, safe derive_key).
+  /usr/bin/python3 has pycryptodome/tqdm/requests via apt python3-* packages. Default
+  'python3' is a uv venv WITHOUT these - use /usr/bin/python3 for FUS work.
+- 2026-10-14 — SIGNED ARTIFACTS DONE (Phase 2 core): out/Nopenix-signed-ota.zip
+  (1.52 GB, md5 82f4477c...) + out/Nopenix-recovery-signed.img (67 MB, md5 a9be748e...),
+  both signed with ~/.android-certs (10 RSA2048 certs, subject CN=Nopenix Release,
+  sha256 fp 12:1C:87:C0...26:AA, valid to 2056). Verified: otacert subject == our
+
 - 2026-10-14 — SIGNED ARTIFACTS DONE (Phase 2 core): out/Nopenix-signed-ota.zip
   (1.52 GB, md5 82f4477c...) + out/Nopenix-recovery-signed.img (67 MB, md5 a9be748e...),
   both signed with ~/.android-certs (10 RSA2048 certs, subject CN=Nopenix Release,

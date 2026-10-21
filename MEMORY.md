@@ -4,6 +4,28 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-21 — MODEM FIX IMPLEMENTED (Option B, user-approved): added
+  `soong_config_set(cbd,protocol,sipc)` + `soong_config_set_bool(cbd,use_legacy_sipc_ioctl,true)`
+  to exynos9820-common BoardConfigCommon.mk and `cbd` to RIL PRODUCT_PACKAGES in
+  common.mk (AOSP working tree /srv/android/nopenix-d2s). Source-built cbd comes from
+  hardware/samsung_slsi-linaro/exynos/cpboot_v3 (Apache-2.0), ABI-verified against our
+  4.14 kernel (all ioctls+structs match; see rea/STATUS.md). NOT yet rebuilt/flash-tested.
+  Fork has other uncommitted changes from earlier sessions — do NOT commit those with
+  modem work.
+
+- 2026-10-21 — MODEM/RE SESSION (`rea/` workspace): all Samsung modem RE work lives in
+  `rea/` (README.md = entry point, STATUS.md = handoff). Root cause of missing modem:
+  **`/vendor/bin/cbd` (cpboot-daemon) is missing from the image** — proprietary-files.txt
+  lists `-vendor/bin/cbd` but TheMuppets 23.2 tree dropped that blob (22.2+). Two fixes:
+  (A) restore blob from rea/bin/blobs/cbd (TheMuppets lineage-22.1, sha b3303b91...) or
+  (B, recommended) build open-source `cpboot_v3` exactly as upstream Lineage 23.2
+  exynos9820-common does (2 soong_config lines in BoardConfigCommon.mk + `cbd` in
+  PRODUCT_PACKAGES). Full ABI verification (ioctls, structs, TOC parse) done — see
+  `rea/docs/cbd-ioctls-and-flow.md`, `rea/STATUS.md`. Kernel side has NO gap
+  (s5000ap + shmem + modem_v1 compiled, System.map verified). All libsec-ril deps
+  present (25/25). Modem = Shannon S5000AP, baseband N975FXXS9HWHA (already in OTA).
+  DO NOT touch build tree for this without user approval.
+
 - 2026-10-20 — FLASH-DAY STATUS (end of session, READ THIS FIRST): Phone = user's
   personal daily driver SM-N975F (d2s), serial RF8MC0SAXCJ. Sequence so far: (1) built
   signed OTA + recovery, (2) user flashed our recovery — WORKED, (3) sideloaded our
@@ -41,6 +63,58 @@
   fus/crypto.py (Cryptodome instead of Crypto, latin-1 nonce fallback, safe derive_key).
   /usr/bin/python3 has pycryptodome/tqdm/requests via apt python3-* packages. Default
   'python3' is a uv venv WITHOUT these - use /usr/bin/python3 for FUS work.
+- 2026-10-20 — SPL MISMATCH ROOT CAUSE (post-format bootloop): TEE keymaster refused
+  to unwrap FBE key: key_os_patchlevel(202609) > TEE _os_patchlevel(202604) — the
+  bootloader/TEE reports the ROOT OF TRUST from the last STOCK firmware (SPL 2026-04,
+  One UI 5.1 base) and REJECTS any keymaster operation with a HIGHER patch level.
+  Fix: rebuilt with RELEASE_PLATFORM_SECURITY_PATCH=2026-04-01 (patched
+  vendor/lineage/release/flag_values/bp4a/RELEASE_PLATFORM_SECURITY_PATCH.textproto,
+  which crDroid had set to 2026-09-01). Verified: out build.prop now shows
+  security_patch=2026-04-01. NOTE: with SPL 202604 the ROM CLAIMS an older SPL than
+  our actual patch set — acceptable for a test device, flag for future review (the
+  ASB content in our tree is still newer; only the DECLARED SPL is downleveled).
+- 2026-10-20 — Second sideload FAILED with 'updater process ended with 1: the current
+  recovery does not support dynamic partitions'. Analysis: d2s PIT has NO super
+  partition (SYSTEM/VENDOR/PRODUCT are real partitions) — the ROM uses the RETROFIT
+  dynamic partitions path. The OTA updater-script calls two custom edify functions:
+  exynos9820.retrofit_dynamic_partitions() (device-specific, defined in
+  device/samsung/exynos9820-common/recovery/recovery_updater.cpp, baked into the
+  OTA's update-binary via TARGET_RECOVERY_UPDATER_LIBS) and update_dynamic_partitions()
+  (built into Lineage recovery + modern TWRP). The custom fn IS embedded in our OTA's
+  update-binary (verified: strings shows exynos9820.retrofit_dynamic_partitions). The
+  failure likely came from the USER'S TWRP build lacking retrofit support, or from
+  running sideload in a recovery that doesn't execute the embedded update-binary
+  extensions. NEXT: confirm which recovery showed the error, and/or sideload in OUR
+  Lineage recovery (which we built WITH the extension). If our recovery also fails,
+  check that librecovery_updater_exynos9820 was actually linked into the OTA
+  update-binary (obj/PACKAGING/target_files_intermediates/*/OTA/ bin dir).
+
+- 2026-10-20 — SPL MISMATCH ROOT CAUSE (post-format bootloop): TEE keymaster refused
+  to unwrap FBE key: key_os_patchlevel(202609) > TEE _os_patchlevel(202604) - the
+  bootloader/TEE reports the ROOT OF TRUST from the last STOCK firmware (SPL 2026-04,
+  One UI 5.1 base) and REJECTS any keymaster operation with a HIGHER patch level.
+  Fix: rebuilt with RELEASE_PLATFORM_SECURITY_PATCH=2026-04-01 (patched
+  vendor/lineage/release/flag_values/bp4a/RELEASE_PLATFORM_SECURITY_PATCH.textproto,
+  which crDroid had set to 2026-09-01). Verified: out build.prop now shows
+  security_patch=2026-04-01. NOTE: with SPL 202604 the ROM CLAIMS an older SPL than
+  our actual patch set - acceptable for a test device, flag for future review (the
+  ASB content in our tree is still newer; only the DECLARED SPL is downleveled).
+- 2026-10-20 - Second sideload FAILED with 'updater process ended with 1: the current
+  recovery does not support dynamic partitions'. Analysis: d2s PIT has NO super
+  partition (SYSTEM/VENDOR/PRODUCT are real partitions) - the ROM uses the RETROFIT
+  dynamic partitions path. The OTA updater-script calls two custom edify functions:
+  exynos9820.retrofit_dynamic_partitions() (device-specific, defined in
+  device/samsung/exynos9820-common/recovery/recovery_updater.cpp, baked into the
+  OTA's update-binary via TARGET_RECOVERY_UPDATER_LIBS) and update_dynamic_partitions()
+  (built into Lineage recovery + modern TWRP). The custom fn IS embedded in our OTA's
+  update-binary (verified: strings shows exynos9820.retrofit_dynamic_partitions). The
+  failure likely came from the USER'S TWRP build lacking retrofit support, or from
+  running sideload in a recovery that doesn't execute the embedded update-binary
+  extensions. NEXT: confirm which recovery showed the error, and/or sideload in OUR
+  Lineage recovery (which we built WITH the extension). If our recovery also fails,
+  check that librecovery_updater_exynos9820 was actually linked into the OTA
+  update-binary.
+
 - 2026-10-14 — SIGNED ARTIFACTS DONE (Phase 2 core): out/Nopenix-signed-ota.zip
   (1.52 GB, md5 82f4477c...) + out/Nopenix-recovery-signed.img (67 MB, md5 a9be748e...),
   both signed with ~/.android-certs (10 RSA2048 certs, subject CN=Nopenix Release,

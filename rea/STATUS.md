@@ -116,7 +116,59 @@ Flash test checklist (both options):
 - `getprop gsm.version.baseband` → N975FXXS9HWHA
 - `dumpsys telephony.registry` for service state.
 
-## Open questions for next session
+## Decision (2026-10-21): Option B APPROVED by user — implemented
+
+The user chose **Option B** (open-source cpboot_v3). Applied to the AOSP working
+tree `/srv/android/nopenix-d2s` (fork clone of NopeNix exynos9820-common, branch 16.0):
+
+1. `device/samsung/exynos9820-common/BoardConfigCommon.mk` — added under `## RIL`:
+   ```
+   $(call soong_config_set,cbd,protocol,sipc)
+   $(call soong_config_set_bool,cbd,use_legacy_sipc_ioctl,true)
+   ```
+2. `device/samsung/exynos9820-common/common.mk` — added `cbd \` to the RIL
+   `PRODUCT_PACKAGES` block (secril_config_svc / sehradiomanager block).
+
+NOT done (intentionally):
+- `proprietary-files.txt` still has the disabled `-vendor/bin/cbd` line — harmless,
+  no stale prebuilt rule exists in the vendor tree (verified: no `cbd` in
+  `vendor/samsung/exynos9820-common/*`).
+- `cld` (loopback daemon in cpboot_v3) not packaged — upstream 23.2 doesn't either.
+- The fork's OTHER uncommitted changes (SPen removal, audio, camera bool, keymaster
+  lib, fstab) belong to earlier Nopenix sessions — left untouched, NOT committed by
+  this workstream.
+
+## ABI verification for Option B (final, all checked 2026-10-21)
+
+- With `use_legacy_sipc_ioctl=true` (LEGACY_SIPC_IOCTL defined), cpboot_v3's SIPC
+  boot path issues: power_reset `_IO('o',0x21)` → xmit per stage `_IO(0x40)` with
+  24-byte `cp_image` == kernel `modem_firmware` → sec reqs `_IO('o',0x53)` with
+  16-byte `modem_sec_req` == kernel struct → power_on `_IO(0x19)` → boot_on
+  `_IO(0x22)` → dl_start `_IO(0x28)` → handshake `_IO(0x24)` → complete-bootup
+  `_IO(0x23)`. Kernel 0x23 (`IOCTL_MODEM_BOOT_OFF` → `s5000ap_boot_off`) waits for
+  CP online and marks STATE_ONLINE — same semantic as cpboot_v3's
+  "complete normal bootup" (naming differs between the S5100-era kernel and the
+  open-source cbd; behavior matches).
+- The LEGACY_IOCTL-only ioctls (0x62 CHECK_SECURITY / 0x63 XMIT_BIN, SIT path) are
+  NOT compiled in our config — not needed.
+- sepolicy: `cbd.te` + file_contexts (`/vendor/bin/cbd` → cbd_exec) +
+  property_contexts (`vendor.cbd.*`, `persist.vendor.cbd.*`) all already present in
+  the tree. `libselinux` (cpboot_v3 dep) present in the image.
+- Defaults for `-t ss310` (BootDumpModap::setCbdArgs): `node_boot=/dev/umts_boot0`,
+  `path_nv_data=/mnt/vendor/efs/nv_data.bin`, NV size 512K, `first_stage_toc_type=TOC_TOC`
+  — matches init.baseband.rc invocation and EFS layout.
+
+## Next steps (post-edit)
+
+1. Rebuild (incremental is fine; soong regenerates config) and verify:
+   `out/target/product/d2s/vendor/bin/cbd` exists (built from cpboot_v3).
+2. Flash, then the checklist in `docs/cbd-ioctls-and-flow.md` (ps/logcat/dmesg/
+   getprop/dumpsys). Watch for:
+   - `vendor.cbd.rfs_check_done` never set → cbd proceeds after 5 s TIMEOUT (non-fatal).
+   - rild restart loop → check `logcat -s RIL` and `libsec-ril` init errors.
+   - CP not booting → `dmesg | grep -E 'mif|s5000ap'` for handshake failures, and
+     confirm `modem.bin` version on `radio` partition matches the OTA
+     (`sha256 1d361a30...`, `rea/bin/hashes.txt`).
 
 - ~~whether `vendor.cbd.rfs_check_done` is set by something~~ RESOLVED: cpboot_v3
   Type.h defines `VPROP_RFS_CHECKDONE "vendor.cbd.rfs_check_done"` — grep who SETS it

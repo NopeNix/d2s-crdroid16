@@ -1,0 +1,9 @@
+# REA binary evidence (blobs, dumps, extracted firmware) — do NOT commit large binaries.
+# Small text evidence (hashes, headers) is fine to commit.
+bin/**/*.bin
+bin/**/*.img
+bin/blobs/*
+!bin/blobs/.gitkeep
+logs/*.dmp
+evidence/d2s-dtb-payload.dtb
+evidence/*.dtb

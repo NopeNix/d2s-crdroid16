@@ -1,0 +1,14 @@
+1d361a301e21812a7450272937f2f3e641650cbd80d88da0dd8d67454d365f81  bin/firmware/modem.bin  # Shannon S5000AP firmware TOC container (from our signed OTA)
+8a4a3d71e3ce5585a263aff693ca2efbfe731a2daf443fdb2c6be543a8b70d40  bin/firmware/modem_BOOT.bin  # BOOT stage split (ARM32, load 0x40000000)
+81aebeb45743427e4ec12f0100969a0c93efa2e15257014488116211eac1b2d0  bin/firmware/modem_MAIN.bin  # MAIN stage split (ARM32, load 0x40010000)
+9bc5a37946dd7ae66ba20789b58dbd296e11cb12acd55e20f60a58c8f6249ca3  bin/firmware/cm.bin  # CryptoManager V50 blob
+aedfb7a1c91f95f668082656d1bc8d8fc6b0cf8c054a0a935c553d8ccb08624e  bin/firmware/uh.bin  # GREENTEA (sboot-updatable firmware part)
+2491ffdcbbb7edba108f45de4afa61c25bc51b2ca5cd62bfa26fdc80b8325dc1  bin/firmware/keystorage.bin  # SLSI key storage (cp_key/vbmeta/fimc refs)
+24b56244feff804b6a7d56848ec064b474ce5b3a0775244b3aef6839e332cae1  bin/firmware/param.bin  # adv-env.img container (device params)
+3442aad83b888297973e1b0d57641fad5fab5462ff0643adca03d81e95405887  bin/firmware/dqmdbg.img  # DQM debug image
+f25f37a4064260ae6d2bb40dae1fae941fc482dae4ce53a61959b9d01220677d  bin/firmware/up_param.bin  # up-param (flash-param) container
+d2d3a9a580f17069dc627587c95daed8ed7611fab96492f7ccb1815085a88bc0  bin/firmware/sboot.bin  # secure boot bootloader (BOTA images)
+b3303b913fb82b861acd85f85a969115e8f8de77aef5cae83a601b0bff85b002  bin/blobs/cbd  # cpboot-daemon analysis target (TheMuppets lineage-22.1)
+cc9252e63da3a9cb0bc0e5133556b120b57819c7e7ff175eda9607b5428afa17  bin/blobs/cbd-20  # TheMuppets lineage-20 (== crDroid 13.0)
+b3303b913fb82b861acd85f85a969115e8f8de77aef5cae83a601b0bff85b002  bin/blobs/cbd-21  # TheMuppets lineage-21
+b3303b913fb82b861acd85f85a969115e8f8de77aef5cae83a601b0bff85b002  bin/blobs/cbd-22.1  # TheMuppets lineage-22.1 (same as cbd-21)

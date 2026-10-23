@@ -1,7 +1,9 @@
 # Flash-Day Status — Handoff Note (2026-10-20, end of session)
 
-> READ THIS FIRST if you are the next LLM session. This documents exactly where
-> the d2s Nopenix flash-day stands and what to do next.
+> **SUPERSEDED** by docs/flash-day-handover-3.md (2026-10-22) — read that one first.
+> This file is kept for historical context only. It documents the ORIGINAL flash-day
+> attempt (Oct 20) with the OLD kernel (4.14.355 crdroidandroid fork, pre-SPL-fix,
+> md5 82f4477c OTA). Most of its content has been superseded by subsequent sessions.
 
 ## Device
 - Samsung Galaxy Note10+ SM-N975F (d2s, Exynos 9825), user's PERSONAL daily driver.

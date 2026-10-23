@@ -4,6 +4,63 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-22 — HANDOVER #3 written: docs/flash-day-handover-3.md (READ THIS ONE).
+  Full rebuild with Lineage kernel 693d1da93597 SUCCEEDED. New artifacts staged in
+  /srv/android/flash-day/: Nopenix-signed-ota.zip md5 f2813d9b8c6ffc6e18984f5617ea0699
+  (boot kernel 4.14.356-openela-rc1-g693d1da93597), Nopenix-recovery-signed.img md5
+  00e4b9c73424c7ceabdb7bae06efed7a, vbmeta-signed.img (flags=3, rollback 1775001600).
+  cbd modem daemon built and included (vendor/bin/cbd). Phone is in DOWNLOAD MODE;
+  heimdall detect works but flash handshake FAILS (libusb timeout on interface 1,
+  tried verbose/debug, modprobe cdc_acm, retries — consistent). Likely USB passthrough
+  regression. NEXT: re-enter download mode fresh, or have user run heimdall on HOST
+  PC to bypass passthrough, or dd vbmeta from TWRP if reachable. Then boot Lineage
+  recovery, sideload OTA (NOT from TWRP). Full details in handover-3.md.
+- 2026-10-22 — HANDOVER #2 (docs/flash-day-handover-2.md): session was context-bound.
+  Verified current artifacts: Nopenix-signed-ota.zip md5 5e284e13..., recovery img md5
+  07c9e60e... (OLDER handovers/MEMORY entries cite 82f4477c/a9be748e — those are pre-
+  SPL-fix artifacts, do not confuse). Phone was NOT connected: adb empty, lsusb no 04e8,
+  heimdall print-pit failed 3x (no device). NOTHING was changed this session. Next LLM:
+  ask user to replug phone → TWRP (verify /data still formatted) → heimdall-flash OUR
+  recovery → sideload in OUR Lineage recovery (user TWRP lacks retrofit dyn-partitions
+  support). Then follow handover doc steps 4–6.
+  2026-10-20 — FLASH-DAY STATUS
+- 2026-10-21 — BOOTLOOP #3 ROOT CAUSE (bpfloader-failed): After SPL fix + format data + successful
+  sideload (16:04, our Lineage recovery, exit 0), phone STILL bootloops: init reboots with
+  'reboot,bpfloader-failed'. netbpfload loads 9 tethering maps OK, then FAILS loading program
+  schedcls_tether_downstream6_ether with EPERM and NO avc denials. On-device reproduction via
+  custom static aarch64 bpf harness (/tmp/bpf_test*.c, cross-compiled with
+  aarch64-linux-gnu-gcc) captured the verifier log: "invalid bpf_context access off=176 size=4".
+  CHAIN: (1) kernel = 4.14.355-openela (Phoenix merge, ae1152aa0a33) whose kernel/sys.c newuname()
+  FAKE-unames "5.4.186" for comm bpfloader/netbpfload/netd (Lineage policy since 2024, commit
+  04ab1a48); (2) netbpfload therefore selects the 5_4-variant tether progs; (3) 25Q4 Connectivity
+  (May-2025+ commits 954bc98a22/5d79fdffd3/84c89b1498) made the 5_4 progs access skb->gso_segs(164)
+  and skb->gso_size(176); (4) the 4.14 kernel's UAPI __sk_buff is only 168 bytes (no
+  tstamp/wire_len/gso fields) so verifier rejects off>=168. ro.build.type=user also suppresses the
+  verifier log dump (isUser() check in loadCodeSections). /metadata = omr partition (fstab).
+  Wiped stale /metadata/vold metadata-encryption key (created 2026-10-18 by 202609-SPL build,
+  unwrappable after SPL downgrade) → fixed the keymaster INVALID_KEY_BLOB bootloop #2.
+  adb root WORKS in our recovery (uid 0 u:r:su:s0). Fix being developed: verify official 12.9's
+  offload.o (downloading from sourceforge) to determine whether official predated gso commits.
+
+- 2026-10-21 — BOOTLOOP #3 REAL FIX: kernel tree was pinned to the WRONG SOURCE. The official
+  crDroid d2s v12.9 (20260426) kernel is **4.14.356-openela-rc1-g693d1da93597** from
+  **LineageOS/android_kernel_samsung_exynos9820** commit 693d1da93597 (NOT the crdroidandroid
+  fork we pinned, which is stuck at 4.14.355 ae1152aa0a33 = Dec 2024; crdroidandroid's 16.0
+  kernel branch never got the later Lineage commits). Official's tethering offload.o is
+  byte-identical to ours (md5 f39685c7...) — so the programs were never the difference; the
+  KERNEL was. Lineage's 693d1da93597 kernel adds to UAPI __sk_buff: tstamp/wire_len/gso_segs/
+  gso_size fields (matching the bionic layout the APEX progs compile against) + verifier
+  convert_ctx_access cases for them (bpf_convert_shinfo_access) — making the 5_4-variant progs
+  verify cleanly on the fake-5.4 uname. FIX APPLIED: fetched 693d1da93597 from LineageOS repo
+  into the kernel tree (fast-forward descendant, 1937 commits ahead, 0 behind), checked out
+  branch official-v129, reverted the temporary device.mk ro.bpf.kver_override experiment, and
+  kicked off full rebuild (brunch d2s, log: /srv/android/nopenix-rebuild.log). After build:
+  sign via /srv/android/sign-target.sh, flash boot via heimdall or re-sideload OTA.
+  Gotchas: SourceForge download needs curl -L + resume (-C -) for 1.5GB; sdat2img transfer-list
+  format = "new <argcount>,s1,e1,s2,e2..." where argcount IS the count of following numbers
+  (pairs of start,end blocks); system.img from .new.dat+transfer.list extracts via debugfs.
+
+
 - 2026-10-21 — MODEM FIX IMPLEMENTED (Option B, user-approved): added
   `soong_config_set(cbd,protocol,sipc)` + `soong_config_set_bool(cbd,use_legacy_sipc_ioctl,true)`
   to exynos9820-common BoardConfigCommon.mk and `cbd` to RIL PRODUCT_PACKAGES in
@@ -222,3 +279,118 @@
 - 2026-10-04 — Beware confusion: `a10` / A10s (SM-A107F) are DIFFERENT Samsung devices.
   crDroid's `d2s` = Galaxy Note10+ (SM-N975F). Some XDA threads mix these; trust the OTA JSON
   and device repos, not thread titles.
+- 2026-10-22 — Bootloop #4 root cause: userdata partition had NO valid fs (no f2fs magic @1024,
+  no ext4 @1080 — leftover encrypted garbage from TWRP-era wipes). vold never mounts /data
+  (fs_mgr skips: invalid f2fs magic), apexd fails "Failed to open decompression destination
+  /data/apex/decompressed/com.android.tethering@...apex: No such file or directory" →
+  tethering APEX never activates → netbpfload missing BPF progs → exit 1 → init
+  reboot_on_failure 'reboot,netbpfload-missing'. Diagnosis chain: last_kmsg (pstore
+  dmesg-ramoops-0.enc.z is encrypted, but /proc/last_kmsg readable in recovery) shows
+  apexd+init msgs. FIX: from Lineage recovery (adb root works):
+  `make_f2fs -g android /dev/block/by-name/userdata 60062720` (vold was never triggered
+  because fstab rec has no force_format; system's mount_with_alternatives only warns).
+  Verified magic + `mount -t f2fs -o ro`. LESSON: after TWRP `format data`, ALWAYS verify
+  fs magic at offset 1024 (f2fs) before first system boot; TWRP format may leave
+  garbage if interrupted (this box: TWRP "format data completed" 2026-10-20 but USB
+  dropped mid-session — partition was never actually fully formatted).
+- 2026-10-22 — heimdall handshake failure after long Download-Mode idle: control xfer OK
+  (detect works) but bulk xfer fails ("Failed to send handshake"). Fix = fresh Download
+  Mode re-entry (user replug). Then flash succeeds. usbreset via sysfs does NOT help.
+  Keep artifacts staged in /srv/android/flash-day/ (md5s in handover-3 are current).
+- 2026-10-22 — Flash-day session 3 (rounds 6-8): (1) gralloc sepolicy fix (allow
+  hal_graphics_allocator_default → graphics_device dir/file/chr_file in
+  device/samsung/exynos9820-common/sepolicy/vendor/hal_graphics_allocator_default.te)
+  removed ALL avc denials but SF STILL SIGABRT-loops → root cause still unknown,
+  need logcat. (2) Sideload OTA of 8aed06b3 build failed 3× DIFFERENTLY: 2×
+  "Error in /sideload/package.zip (killed by signal 7)" deterministic time_total=31
+  (both times in post-panic recovery), 1× adb connection drop mid-transfer. The
+  successful installs earlier were from fresh recovery boots. (3) BCB route
+  (--update_package=/data/ota.zip) works but recovery serves /data packages via
+  FUSE as /sideload/package.zip, then setup_install_mounts() fails
+  "Failed to unmount /data: Device or resource busy" (fuse daemon holds fd) →
+  /data-hosted OTA via BCB is a dead end on this recovery. /cache too small
+  (600MB) for 1.5GB zip. (4) WORKING FLASH PATH: chunked adb push (split -b 400M;
+  single pushes >~800MB collapse to ~1MB/s on this KVM passthrough; chunks run
+  100-1000MB/s each!) → `cat /data/chunk-* > /dev/block/by-name/system` + md5sum
+  verify block device vs host file. Flashed boot/dtbo/vbmeta/super all verified.
+  super.img built locally: build_super_image.py out/signed-target_files.zip →
+  sparse 2.95GB → simg2img → 6.5GB raw; lpdump confirmed layout matches device
+  (single-slot Samsung: partitions named system/vendor/product/odm/system_ext,
+  no _a suffix). (5) fastbootd from VM unusable: Samsung gadget advertises
+  bInterfaceProtocol=1 (AOSP fastboot wants 3) — patched host fastboot.cpp to
+  accept protocol 1 & rebuilt (out/host/linux-x86/bin/fastboot); still flaky:
+  gadget re-enumerates every command, then USB dropped off bus entirely.
+  (6) adb server respawns (watchers/canvas) and re-claims USB device via usbfs,
+  starving fastboot — kill adb server right before fastboot. (7) init.debug.rc
+  round 1: logcat -f /dev/kmsg crashed instantly ("Connection reset by peer");
+  adbd never seen. Round 2 = `logcat | tee /dev/kmsg` + explicit `start adbd`.
+  (8) Lineage userdebug: ro.adb.secure=1 + ro.debuggable=0 UNLESS
+  WITH_ADB_INSECURE=true at build time. (9) /data is PLAINTEXT raw f2fs (no
+  metadata encryption active — /metadata/vold exists but empty-ish); pushed
+  files read back md5-clean; FBE-looking dirs exist under /data/misc (per-dir
+  policies) but /data root is unpolicied → staging files readable across
+  recovery reboots.
+- 2026-10-23 — Bootloop #7 (bootanimation loop) root cause: missing libshim_camera.so. The
+  libexynoscamera3 blob (TheMuppets 23.2) links against libshim_camera expecting BOTH the
+  old GraphicBufferMapper::unlock(const native_handle*) symbol AND exynos::Fence class
+  symbols (_ZN7exynos55FenceC1Ei, C1Eunique_fd, 4waitEi + vtable). The in-tree shim
+  (device/samsung/exynos9820-common/shims/libcamera) only provides unlock; exynos9825.mk
+  (which d2s inherits) does NOT add libshim_camera to PRODUCT_PACKAGES (only the -r
+  variant does). Camera HAL dlopen fails → vendor.camera.provider SIGSEGV (fault addr 0x10)
+  → kernel panic. FIX: (1) extended shims/libcamera/GraphicBufferMapper.cpp with a faithful
+  exynos::Fence class (ABI from disassembling deuspivete's official v12.9 libshim_camera.so:
+  layout vptr+int+int fd, vtable 2 slots (dtor, deleting dtor), wait()=sync_wait+close+return
+  -errno, fd=-1 → return 0); added libbase to shim shared_libs; (2) added libshim_camera
+  to exynos9825.mk. KEY EVIDENCE PATH: logcat→kmsg streamer (init.debug.rc tee /dev/kmsg)
+  FINALLY captured the dlopen failure line. Official v12.9 vendor mount workflow: brotli -d
+  vendor.new.dat.br, apply transfer.list 'new' ranges to flat img, mount -t erofs,loop —
+  worked for direct comparison (md5 libGLES_mali identical, so blob set matches).
+- 2026-10-23 — gralloc.universal9825.so (SLSI gralloc3 legacy hw module) was missing from
+  our build → mali "Invalid handle" → skia EGL_BAD_ALLOC (0x300c) → RenderEngine SIGABRT
+  loop (bootloop #6). TWO fixes: (1) PRODUCT_PACKAGES += gralloc.universal9825 in
+  exynos9820-common/common.mk Display section; (2) CRITICAL: the slsi gralloc3
+  Android.bp declares its OWN soong_namespace, so soong never parsed it — must add
+  PRODUCT_SOONG_NAMESPACES += hardware/samsung_slsi-linaro/exynos/gralloc/gralloc3.
+  (gralloc4 has no namespace block → parsed under parent ns → worked). Verified against
+  official v12.9 vendor image which contains gralloc.universal9825.so (89.5KB).
+  After fix: phone BOOTS ANDROID (MTP enumeration, boot animation renders!).
+- 2026-10-23 (later) — Camera shim FIX #1 FAILED silently: I wrote the Fence shim in
+  namespace `exynos` but the blob needs `exynos5` (_ZN7exynos55FenceC1Ei = exynos5::Fence).
+  Lesson: VERIFY exported symbol names against the blob's UND list BEFORE building
+  (readelf --dyn-syms on the .so, decode the mangled name). The shim now exports the right
+  names after renaming namespace exynos → exynos5 (verified with a test compile:
+  _ZN7exynos55FenceC1Ei + _ZN7exynos55Fence4waitEi produced). Bootloop #8 (bootanimation
+  loop persists) root cause was this same dlopen failure repeating.
+  Rebuild in flight: rebuild-shim2.log / sign10.log.
+- 2026-10-23 (afternoon) — Flash-state verification workflow that saved us: dd + md5 per
+  400MB chunk BEFORE writing to super; then read-back verify region-by-region. Confirmed
+  the 13:30 dd flash DID land the exynos5Fence shim (erofs mount of raw vendor region
+  extracted from sda25: sector 4689920, 393000 sectors). The user's "still looping"
+  report came BEFORE the new flash was applied — phone hadn't booted the new build yet.
+  ALSO: /proc/last_kmsg only updates after panic/reboot from a FAILED boot; the 11:29
+  kmsg was stale. AVB check: dev vbmeta boot hash (49917952 bytes, salt b65c5b...) =
+  sha256(salt+boot[:49917952]) ✓ — boot image valid for its vbmeta.
+- 2026-10-23 (evening) — Bootloop #9 (bootanimation loop, gralloc+camera shim build):
+  camera dlopen FIXED (no dlopen errors in 19:23 boot kmsg!). New failure: system_server
+  hangs >33min in early boot (last progress marker SystemServerTiming: StartDreamManagFull
+  19:18:01), Watchdog fires WAITED_UNTIL_PRE_WATCHDOG, dumps native stacks via
+  tombstoned intercept (in-memory, LOST on reboot — not written to /data due to
+  'skipping tombstone file creation due to intercept'). Watchdog MAIN thread itself
+  spams 82x 'Waited one second for vendor.lineage.touch.IKeyDisabler/default' — touch
+  HAL (vendor.lineage.touch-service.samsung) never registers in servicemanager. Also:
+  adbd in system gets 'FUNCTIONFS_BIND timed out' → USB adb never enumerates in system
+  boot (configfs/UDC wiring issue; recovery adb works fine). Kernel panic at end was
+  USER force-reset (VOL_DOWN+POWER at 19:23:21, hard_reset_hook in interrupt — benign).
+  NEXT: build with WITH_ADB_INSECURE=true (ro.adb.secure=0, ro.debuggable=1) → when hang
+  hits, adb root works in system → capture /data/tombstones + full java stack of
+  system_server. ALSO fix init.debug.rc UDC write ordering + verify touch HAL start
+  (it needs /sys/class/sec/sec_touchkey nodes — check sec_ts driver state at that point).
+  Build in flight: rebuild-insec.log / sign11.log.
+- 2026-10-23 (night) — Handover #4 written: docs/flash-day-handover-4.md (also at
+  /srv/android/flash-day/HANDOVER-4.md). READ THAT FIRST. State: v4 build (exynos5
+  camera shim) on flash; phone boots but system_server hangs at StartDreamManager,
+  Watchdog fires, stacks lost (tombstoned intercept). Touch HAL never registers
+  (82x IKeyDisabler waits). adbd in system: FUNCTIONFS_BIND timeout (USB adb broken in
+  system, works in recovery). NEXT: rebuild w/ ro.debuggable=1 (device.mk patched,
+  NOT built), then capture tombstones/java stacks via adb in system. Flash recipe +
+  all gotchas in handover-4. v4 md5s: OTA b5e02f17, recovery 9c277226.

@@ -4,6 +4,26 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-25 — SESSION #6 (post first-boot). Subsystem verification on device v12:
+  sensors OK (full list), camera OK (5 cams), audio HAL OK, GNSS OK, S-Pen input dev OK,
+  mobile data OK. BLUETOOTH BROKEN: android.hardware.bluetooth@1.0-impl dlopens libbt-vendor.so
+  which is NOT in our vendor image (official v12.9 HAS /vendor/lib64/libbt-vendor.so — verified
+  in official vendor.new.dat). Root cause: our fork of exynos9820-common is based on an older
+  Lineage branch; upstream lineage-23.2 common.mk has $(call soong_config_set,brcm_libbt,
+  custom_bt_config,//$(COMMON_PATH):vnd_exynos9820.txt) + libbt-vendor:64 in PRODUCT_PACKAGES,
+  and bluetooth/Android.bp (filegroup vnd_exynos9820.txt -> libbt_vndcfg.txt). FIX APPLIED
+  LOCAL-ONLY: added bluetooth/Android.bp + soong_config_set + libbt-vendor:64 in common.mk.
+  Also: adb root NEVER works despite ro.debuggable=1 because adbd caches its debuggable check
+  at early start (packages/modules/adb/daemon/main.cpp: ANDROID_DEBUGGABLE ||
+  __android_log_is_debuggable() evaluated before system/build.prop lands). FIX APPLIED
+  LOCAL-ONLY: gen_build_prop.py now skips ro.secure=1 when BuildBrokenDupSysprop is set
+  (device must be rebuilt for both fixes to land).
+  INCIDENT: phone dropped off USB completely right after `adb root` attempt (adbd restart +
+  USB gadget unbind glitched VM passthrough?) — device NOT reappearing in lsusb; asked user
+  to replug. HOST RISK: 'Broadcast ... system will reboot now!' seen 18:34 UTC (root wall
+  msg); host still up at 19:00 UTC, no shutdown process — verify host survival next session.
+  file_editor tool BROKEN this session (drops text params) — use terminal sed instead.
+
 - 2026-10-24 — **FIRST FULL BOOT SUCCESS. Handover #5 (docs/flash-day-handover-5.md) — READ THAT.**
   Phone boots to home screen with adb, WiFi, LTE (Telekom.de, fraenk SIM LOADED), and cbd+rild
   running (Option-B cpboot_v3 WORKS on device, baseband N975FXXS9HWH6, SHANNON5000).

@@ -30,23 +30,39 @@ Verified GOOD via adb (while device was attached):
   -> com.android.bluetooth dies -> AdapterService restart loop.
 - **Official v12.9 DOES ship /vendor/lib64/libbt-vendor.so** (verified by string search
   inside official-v12.9.zip's vendor.new.dat).
-- Root cause in tree: our fork of device/samsung/exynos9820-common (lineage-22.x-era base)
-  is missing the lineage-23.2 bluetooth glue. Upstream lineage-23.2 common.mk has:
-      $(call soong_config_set,brcm_libbt,custom_bt_config,//$(COMMON_PATH):vnd_exynos9820.txt)
-      PRODUCT_PACKAGES += ... libbt-vendor:64
-  and bluetooth/Android.bp (filegroup vnd_exynos9820.txt -> bluetooth/libbt_vndcfg.txt).
-  Our fork had neither -> libbt-vendor never built -> not in vendor image.
+- Root cause in tree (TWO missing pieces, both from upstream lineage-23.2 common.mk):
+  (1) the soong_config_set for brcm_libbt + `libbt-vendor:64` in PRODUCT_PACKAGES, and
+      bluetooth/Android.bp (filegroup vnd_exynos9820.txt -> bluetooth/libbt_vndcfg.txt);
+  (2) `hardware/broadcom/libbt` in PRODUCT_SOONG_NAMESPACES (fork's "Soong Namespaces"
+      block, ~line 320). That Android.bp declares `soong_namespace {}`, so WITHOUT being
+      listed in PRODUCT_SOONG_NAMESPACES soong never builds its modules even though it
+      parses the file — first rebuild attempt failed kati with "lineage_d2s.mk includes
+      non-existent modules in PRODUCT_PACKAGES: libbt-vendor". Adding the namespace fixed
+      it (kati passed on the next run).
 
 ### FIXES APPLIED THIS SESSION (all LOCAL-ONLY in /srv/android/nopenix-d2s, not pushed)
 1. **Bluetooth**: created device/samsung/exynos9820-common/bluetooth/Android.bp
    (filegroup, mirrors upstream) and added the soong_config_set + `libbt-vendor:64`
-   to common.mk's Bluetooth block. Needs a rebuild to land in the vendor image.
+   to common.mk's Bluetooth block, PLUS `hardware/broadcom/libbt` in
+   PRODUCT_SOONG_NAMESPACES (the key one — namespace wasn't listed so soong never
+   built its modules; first rebuild attempt failed kati with "non-existent modules:
+   libbt-vendor", kati passed after adding the namespace). Needs a rebuild to land.
+   BUILD STATUS AT HANDOFF: v13 build running (build13.log, launched ~19:31 UTC after
+   host reboot). Soong full analysis (50 min, cached) + kati PASSED the libbt-vendor
+   module check; build is in the ninja phase [96% 268/277, Target vendor fs image].
+   NEXT AGENT: poll build13.log until it finishes (~10 more min), then sign.
 2. **adb root**: extended build/soong/scripts/gen_build_prop.py — when
    BuildBrokenDupSysprop (our flash-day escape hatch, set in d2s BoardConfig.mk) is on,
    it now ALSO skips `ro.secure=1` (emits ro.secure=0). Reason: adbd caches its
    debuggable check at its early start BEFORE system/build.prop lands, so the runtime
    ro.debuggable=1 never reaches it; ro.secure=0 is the only reliable path.
    (Backup of the pre-patch file: /tmp/gen_build_prop.py.bak — may be lost on reboot.)
+
+### BUILD STATUS AT HANDOFF
+- v13 build running (build13.log, launched ~19:31 UTC after host reboot). At handoff it is
+  in the ninja phase: `[96% 268/277 13m57s remaining] Target vendor fs image:
+  out/target/product/d2s/vendor.img` — roughly 10 more minutes. Poll build13.log until
+  "Build completed" or similar, then sign.
 
 ### INCIDENT: phone vanished from USB
 - Right after an `adb root` attempt (~19:05 device time; adbd restarted, USB gadget
@@ -61,9 +77,8 @@ Verified GOOD via adb (while device was attached):
 
 ## NEXT STEPS (in order)
 1. **Re-establish adb** with the phone (user action: replug/unlock).
-2. **Rebuild v13**: `bash /srv/android/build-start.sh` (background, hours). Picks up the
-   bluetooth + ro.secure fixes. Artifacts land in out/target/product/d2s; sign with
-   /srv/android/sign-target.sh as before.
+2. **Rebuild v13**: IN PROGRESS at handoff (build13.log, launched ~19:31 UTC). When it
+   finishes, sign with /srv/android/sign-target.sh as before.
 3. **Flash v13** using the proven recipe in docs/flash-day-handover-4.md (chunked push +
    dd for super/boot/dtbo/vbmeta/recovery; verify md5s; never heimdall for super).
 4. **On v13 verify**: BT turns on (Settings or `svc bluetooth enable`), `adb root` gives

@@ -24,6 +24,20 @@
   msg); host still up at 19:00 UTC, no shutdown process — verify host survival next session.
   file_editor tool BROKEN this session (drops text params) — use terminal sed instead.
 
+- 2026-10-25 — CONTEXT-RUN-OUT: v13 build running (build13.log, launched ~19:24 UTC after
+  host reboot). Soong full analysis (50 min, cached now) + kati PASSED the libbt-vendor
+  module check (fix = PRODUCT_SOONG_NAMESPACES += hardware/broadcom/libbt in exynos9820-common
+  common.mk, line ~321; fork had dropped it — that's why soong never built the namespace).
+  Also confirm previous-build parity: working v12 was TARGET_BUILD_VARIANT=userdebug
+  (rebuild13-debuggable.log), same as v13. NEXT: when build finishes, sign with
+  /srv/android/sign-target.sh (artifacts to /srv/android/flash-day/), then flash per
+  handover-4 recipe. On device verify: BT turns on (svc bluetooth enable, no
+  "unable to open libbt-vendor.so" in logcat), adb root gives uid 0 (ro.secure=0 now
+  emitted), then finish handover-5 checklist (audio sound test, GNSS fix, camera open,
+  setup wizard). Phone was OFF-USB at 19:08 (lost right after adb root attempt); user asked
+  to replug — check `lsusb | grep 04e8` first. Full session detail:
+  docs/flash-day-handover-6.md + MEMORY entry same date.
+
 - 2026-10-24 — **FIRST FULL BOOT SUCCESS. Handover #5 (docs/flash-day-handover-5.md) — READ THAT.**
   Phone boots to home screen with adb, WiFi, LTE (Telekom.de, fraenk SIM LOADED), and cbd+rild
   running (Option-B cpboot_v3 WORKS on device, baseband N975FXXS9HWH6, SHANNON5000).

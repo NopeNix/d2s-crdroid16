@@ -4,6 +4,15 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-24 — **FIRST FULL BOOT SUCCESS. Handover #5 (docs/flash-day-handover-5.md) — READ THAT.**
+  Phone boots to home screen with adb, WiFi, LTE (Telekom.de, fraenk SIM LOADED), and cbd+rild
+  running (Option-B cpboot_v3 WORKS on device, baseband N975FXXS9HWH6, SHANNON5000).
+  Two root causes fixed in v12 build: (1) crDroid's SPOOF_SAFETYNET init feature overrides
+  device.mk ro.debuggable=1 at runtime → adb unauthorized; disable it in device tree init.
+  (2) d2s manifest.xml declared IKeyDisabler/IAdaptiveBacklight HALs whose sysfs nodes don't
+  exist → PhoneWindowManager blocks in waitForDeclaredService → system_server hang. Remove
+  unsupported HAL interfaces from manifest.xml. Flash recipe unchanged (handover #4).
+  Device tree fixes are LOCAL-ONLY in /srv/android/nopenix-d2s — do not push yet.
 - 2026-10-22 — HANDOVER #3 written: docs/flash-day-handover-3.md (READ THIS ONE).
   Full rebuild with Lineage kernel 693d1da93597 SUCCEEDED. New artifacts staged in
   /srv/android/flash-day/: Nopenix-signed-ota.zip md5 f2813d9b8c6ffc6e18984f5617ea0699

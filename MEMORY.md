@@ -4,6 +4,26 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-26 — SESSION #7 (handover #7: docs/flash-day-handover-7.md — READ THAT).
+  v13 built+signed+FLASHED, all partitions md5-verified. Rebooted 08:25 UTC into system —
+  **adb does NOT connect**: phone shows 18d1:4ee7 (serial RF8MC0SAXCJ), ffs interface
+  advertised (class 255), NO kernel driver bound, adb devices empty 25+ min; USB
+  unbind/rebind + root-usbreset did not help; phone screen NEVER CHECKED. Suspect:
+  FUNCTIONFS_BIND pattern again → system-side adbd still broken → system_server hang
+  may persist; the VINTF/touch-HAL fix is in v13 so a same-symptom hang kills that
+  theory. Reboot mechanics gotchas: (1) `m target-files-package` deletes its own TF zip
+  output after packaging → sign script's glob fails; rerun `m target-files-package`
+  (~17 min) with SELINUX_IGNORE_NEVERALLOWS=true or sepolicy neverallow kills it.
+  (2) sign_target_files_apks is ~75-90 min at ~1MB/s — DON'T kill thinking it's hung.
+  (3) /tmp is 5.3GB tmpfs; ENOSPC at FinalizeMetadata; tempfile IGNORES TMPDIR if dir
+  missing → mkdir -p /srv/android/tmp first. (4) PartitionMapFromTargetFiles is locally
+  patched to read out/tf-dir → if deleted, stage-3 KeyErrors 'system'; re-unzip
+  signed TF. (5) build_super_image needs toybox: PATH += prebuilts/build-tools/linux-x86/bin.
+  (6) dd chunk loop hex-parsed chunk numbers 10-15 → 2.4GB gap; caught by full
+  read-back md5; write explicit decimal offsets. (7) Terminal backgrounding only works
+  as `setsid wrapper.sh < /dev/null &`; heredocs corrupt; think+terminal in one message
+  can silently drop the terminal call.
+
 - 2026-10-25 — SESSION #6 (post first-boot). Subsystem verification on device v12:
   sensors OK (full list), camera OK (5 cams), audio HAL OK, GNSS OK, S-Pen input dev OK,
   mobile data OK. BLUETOOTH BROKEN: android.hardware.bluetooth@1.0-impl dlopens libbt-vendor.so

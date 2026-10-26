@@ -4,6 +4,30 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 
+- 2026-10-26 — SESSION #8 (dev line round 2 COMPLETE; handover-9 pending). v13.0-dev
+  built, signed, flashed, verified: adb root=uid0 (WITH_SU=true needed: crDroid adbd
+  uses adbroot_service binder, adb_root+su only packaged if WITH_SU=true; also
+  /data/adbroot/enabled must contain "1" — create via `su 0 sh -c 'mkdir -p
+  /data/adbroot; echo 1 > /data/adbroot/enabled'` once), branding (variant=dev,
+  13.0, display v13.0-20261026, ro.lineage.build.version=23.2), BT/LTE/WiFi green.
+  KEY DISCOVERIES: (1) crDroid 16 Updater does NOT read lineage.updater.uri prop —
+  override updater_server_url string via device overlay dir
+  overlay/packages/apps/Updater/app/src/main/res/values/strings.xml (auto-RRO to
+  vendor/overlay/Updater__*rro_vendor.apk, RRO lands in VENDOR because
+  DEVICE_PACKAGE_OVERLAYS). (2) Updater JSON = {"response":[{maintainer,oem,device,
+  filename,download,timestamp,md5?,sha256,size,version,buildtype,os_patch_level,
+  os_sdk_level,...}]} — FLAT fields, NOT nested files[]; bare array also rejected.
+  (3) raw.githubusercontent.com CDN caches ~5min after push. (4) Updater matches by
+  timestamp+sdk, NOT version field. (5) version.mk CR_VERSION := -> ?= lets device
+  tree override crDroid version everywhere (patch carried in hub patches/).
+  (6) init.debug.rc logcat->/cache/bootlog.txt FILLED 564MB cache partition ->
+  OTA updater ENOSPC; capped at 50MB via head -c now. FLASH METHOD (proven 2x,
+  agent-driven, no user menu steps): adb reboot recovery; `adb root` in recovery
+  (works: uid0); mount -t f2fs /dev/block/sda32 /data; split zip 400MB chunks;
+  push+md5 each; cat chunks > /data/otaNN.zip; md5 vs host; unzip update-binary to
+  /tmp; `setsid sh -c 'nohup /tmp/META-INF/com/google/android/update-binary 3 1
+  /data/otaNN.zip 3>/tmp/upd.log 1>/tmp/out 2>/tmp/err &'` (ELF, NOT sh script;
+  fd3=progress); wait for 'script succeeded'; reboot. Old-flows superceded.
 - 2026-10-26 — SESSION #7 (handover #7: docs/flash-day-handover-7.md — READ THAT).
   v13 built+signed+FLASHED, all partitions md5-verified. Rebooted 08:25 UTC into system —
   **adb does NOT connect**: phone shows 18d1:4ee7 (serial RF8MC0SAXCJ), ffs interface
@@ -457,3 +481,45 @@
   system, works in recovery). NEXT: rebuild w/ ro.debuggable=1 (device.mk patched,
   NOT built), then capture tombstones/java stacks via adb in system. Flash recipe +
   all gotchas in handover-4. v4 md5s: OTA b5e02f17, recovery 9c277226.
+- 2026-10-26 (later) — **v13 CONFIRMED WORKING. Setup wizard completed, system fully
+  alive.** The handover-7 "adb does not connect" mystery: adbd was fine all along — the
+  phone just needed the RSA authorization prompt accepted (setup wizard + unauthorized
+  state hid it). `adb devices` showed unauthorized after user re-enabled ADB; accepting
+  the prompt fixed everything. Subsystem verification: BT **ON since boot, 0 crashes**
+  (libbt-vendor glue fix WORKS); LTE Telekom IN_SERVICE voice+data+SMS; WiFi ok; speaker
+  audio ok; full sensor list ok; S-Pen (sec_e-pen) ok; camera 5 devices enumerated; GNSS
+  service up (no fix tested — needs outdoor). NOTE: ro.secure=1 on phone + no
+  ro.lineage.build.version + display version still says "v12.12-20261025". Root cause
+  of ro.secure=1: gen_build_prop.py fix IS in tree (soong/scripts/, gated on
+  config["BuildBrokenDupSysprop"]) but that flag was NOT set in the v13 build config —
+  adb root therefore still uid=2000. Not blocking; only needed for future diagnosis.
+  User-facing tests pending (BT pairing, audio sound, camera photo, GNSS outdoor fix),
+  then: push device-tree fixes to NopeNix forks, then OTA release packaging.
+- 2026-10-26 — USER DECISION: target = DAILY DRIVER image (banking, real data). Codified
+  in docs/daily-driver.md; AGENTS.md header + rule 8, README, ROADMAP, release/ota/
+  build-guide/signing/branding updated. Hard requirements: current ASB patch level
+  (monthly cadence) + non-debug release builds (no adb-root, no dup-sysprop hacks,
+  no Magisk/root). Known limit: unlocked BL + own keys = no Play Integrity; banking
+  apps enforcing integrity may fail — test owner's real apps per release and record
+  in releases/. Debug builds are bring-up only, never released.
+
+- 2026-10-26 (2nd) — POLICY: two build lines, docs/dev-prod.md is authoritative
+  (supersedes the same-morning "no Magisk" stance, which the owner reversed). DEV =
+  userdebug + BUILD_BROKEN_DUP_SYSPROP, open playground, CURRENT MAIN GOAL; dev
+  publishes to ota/dev.json (nightly) by design — OTA debugging happens on dev.
+  PROD = hardened + Magisk root by design (Zygisk denylist for banking; owner's
+  proven crDroid-12.9-era posture), SELinux enforcing, owner encrypts. Both lines
+  share one signing key set (dev/prod separation is channel+discipline, not crypto).
+  Prod OTA rewrites boot -> Magisk re-patch before reboot every time. Single phone:
+  default discipline = wipe userdata entering dev and again returning to prod.
+  Sequencing: dev Definition of done FIRST, prod only after. Next-session task
+  list: docs/flash-day-handover-8.md (branding/variant props -> dev build with
+  knobs ON -> flash -> verify -> dev OTA channel -> fork pushes -> GNSS test).
+  Key mechanism detail: BUILD_BROKEN_DUP_SYSPROP feeds gen_build_prop.py's
+  config["BuildBrokenDupSysprop"] via build/make/core/soong_config.mk:303; the
+  local patch is in build/soong/scripts/gen_build_prop.py:350-357 (NOT our fork —
+  must be carried as a documented local patch, else a fresh sync loses it).
+- 2026-10-26 — **PERMANENT POLICY (user): every future build MUST integrate the latest
+  available Android ASB + latest patches of all other components we can get.** Apply to
+  both build lines, every build, from now on. Next build should start with
+  `repo sync` of crDroid 16.0 upstream to pick up new SPL (current base: 2026-04-01).

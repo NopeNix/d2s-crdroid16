@@ -1,0 +1,17 @@
+[
+  {
+    "datetime": 1793044455,
+    "files": [
+      {
+        "filename": "Nopenix-signed-ota.zip",
+        "sha256": "e1da56bb0cafae1f3f73f03360a7c9e1d25dcf9e20b142107705955dcce2d6e4",
+        "size": 1518604804,
+        "url": "https://github.com/NopeNix/d2s-crdroid16/releases/latest/download/Nopenix-signed-ota.zip",
+        "os_patch_level": "2026-04-01",
+        "os_sdk_level": 36
+      }
+    ],
+    "type": "nightly",
+    "version": "23.2"
+  }
+]

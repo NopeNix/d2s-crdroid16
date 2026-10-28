@@ -71,7 +71,14 @@ Later updates (Nopenix → Nopenix) are true in-place OTAs via the Updater app.
 
 ## OTA release checklist (per build)
 
-1. Build + sign (docs/signing.md, docs/build-guide.md).
+> Two channels per docs/dev-prod.md: `ota/dev.json` (type nightly, dev line —
+> published freely, that is the point) and `ota/prod.json` (type release, prod line
+> — only after the prod Definition of done). Devices point at their channel via
+> `lineage.updater.uri` baked per line. Magisk note for prod: OTA rewrites `boot`
+> → Magisk re-patch required before reboot after every prod OTA.
+
+1. Build + sign (docs/signing.md, docs/build-guide.md); prod releases use the
+   hardened variant, dev releases the debug variant.
 2. Run `scripts/ota-json.sh` on the zip → prints JSON block.
 3. Commit updated `ota/d2s.json` + create GitHub release with the zip + recovery.img.
 4. Verify with `curl <json url>` and confirm `version`/`datetime` advanced.

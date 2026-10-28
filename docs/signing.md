@@ -44,3 +44,12 @@ ln -sf releasekey.x509.pem ~/.android-certs/testkey.x509.pem
 - `~/.android-certs/` never enters git. Back it up privately; losing it means every
   future OTA needs another manual sideload (new key = untrusted by installed recovery).
 - Note in each release which key fingerprint signed it.
+
+## Dev/prod stance (2026-10-26, supersedes the earlier "no Magisk" stance)
+
+- Both lines sign with the SAME Nopenix key set; dev/prod separation is enforced by
+  OTA channels + discipline, not signatures (accepted, single-phone project).
+- Own keys + unlocked bootloader ⇒ no Google Play Integrity — accepted.
+- PROD carries Magisk root by design (owner's proven posture: crDroid stealth +
+  Zygisk denylist for banking apps). Prod must NOT carry the flash-day debug hooks
+  (dup-sysprop escape hatch, adb-root enablement); SELinux stays enforcing.

@@ -8,6 +8,12 @@ and serves OTA updates to the phone directly.
 
 **Scope: security-patch continuation only. No new features.**
 
+**Two build lines** (decided 2026-10-26, see `docs/dev-prod.md`): **dev** — an
+open, intentionally insecure playground (userdebug, adb-root) that is the current
+main goal; **prod** — the owner's hardened daily driver with Magisk root and
+encrypted data, banking-app ready. Known limit (both): unlocked bootloader + custom
+keys ⇒ Google Play Integrity cannot pass — accepted.
+
 ## Repo map
 
 - `AGENTS.md` — entry point for AI agents (read first)
@@ -20,6 +26,8 @@ and serves OTA updates to the phone directly.
   - `branding.md` — where/how the "Nopenix" identity is injected
   - `signing.md` — keys, AVB, recovery trust
   - `device/` — device facts (specs, partitions, firmware)
+  - `dev-prod.md` — the dev/prod two-line policy: channels, hardening, release gates
+  - `daily-driver.md` — (superseded by dev-prod.md, kept for history)
   - `research/` — dated raw research notes (append-only)
   - `ROADMAP.md` — project status and next steps
 - `manifests/nopenix.xml` — repo local-manifest (the missing piece the official maintainer never published)
@@ -35,4 +43,7 @@ used at branch `16.0` (blobs: see `docs/blob-strategy.md`).
 
 ## Status
 
-Structure + documentation phase. No build produced yet — see `docs/ROADMAP.md`.
+v13 (2026-10-25) is built, signed, booted, and verified on the device (BT/LTE/WiFi/
+audio/sensors/S-Pen green). Current main goal: the fully working DEV build (debug
+knobs + dev OTA channel exercised) — see `docs/flash-day-handover-8.md`. Prod comes
+after. See `docs/ROADMAP.md`.

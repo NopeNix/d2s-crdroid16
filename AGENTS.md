@@ -6,6 +6,19 @@ continuation after the official maintainer (deuspivete) stopped building (last o
 build: 2026-04-26, v12.9). Our builds are branded **Nopenix** and are security-patch
 continuations only — **no new features**.
 
+## Two build lines (decided 2026-10-26): DEV and PROD — see docs/dev-prod.md
+
+- **DEV line (CURRENT MAIN GOAL)**: userdebug + debug knobs (`BUILD_BROKEN_DUP_SYSPROP`,
+  adb-root), intentionally insecure playground, never holds sensitive data. Its OTA
+  channel (nightly) IS exercised — OTA debugging happens on dev.
+- **PROD line**: hardened daily driver **with root: Magisk by design** (owner's
+  proven posture: crDroid stealth + Magisk Zygisk denylist for banking apps), SELinux
+  enforcing, owner encrypts the device. Security patch level tracks upstream ASB.
+- Known limit (both): unlocked bootloader + own keys ⇒ no Google Play Integrity —
+  accepted; applies to every custom ROM on this hardware.
+- Sequencing: get dev fully working first (its Definition of done in docs/dev-prod.md);
+  prod work starts only after. Next-session task list: docs/flash-day-handover-8.md.
+
 ## Repo layout (hub-and-forks model — IMPORTANT)
 
 This repo is the **hub**: docs, manifests, scripts, memory, release notes.
@@ -52,8 +65,9 @@ pushing to its `16.0` (or blob) branch.
    in the forks. The hub repo's `main` gets direct small doc commits only with approval.
 7. **Verify claims against the sources.** When you touch manifests or device configs,
    re-check the upstream (`crdroidandroid/*`, `LineageOS/*`) before assuming.
-8. **Goal discipline**: security-patch continuation + working OTA only. If a change adds
-   features, flag it to the user and get explicit buy-in.
+8. **Goal discipline**: security-patch continuation + working OTA only, per the
+   dev/prod policy (see above). If a change adds features, flag it to the user and
+   get explicit buy-in. Debug-only hacks never ship in prod builds.
 
 ## The 60-second orientation for a new session
 

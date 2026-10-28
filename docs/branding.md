@@ -35,3 +35,9 @@ additive, via props and display strings.
 - [ ] Confirm `lineage.updater.uri` is picked up from device-tree prop overlay.
 
 > Whoever resolves these: update this doc (ask user first) + append to MEMORY.md.
+
+> Dev/prod note (2026-10-26): v13 still displays "v12.12-20261025" and carries no
+> `ro.lineage.build.version` — branding props must be fixed for the dev line already,
+> because the Updater OTA version-match depends on `ro.lineage.build.version` (see
+> `docs/ota.md` and `docs/dev-prod.md`; handover-8 item 2). Add `ro.nopenix.variant`
+> (dev|prod) and per-line zip naming (`nopenix-dev-*` / `nopenix-*`).

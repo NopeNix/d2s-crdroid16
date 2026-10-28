@@ -1,8 +1,12 @@
 # Build guide — Nopenix crDroid 16 for d2s (local build)
 
-> Status: written from the official crDroid flow + reconstructed sources. Not yet executed
-> end-to-end. **First execution must update this file** (with user approval) and MEMORY.md
-> with everything that differs in practice.
+> Status: executed end-to-end (v13, 2026-10-25); the practical flash-day gotchas live in
+> `MEMORY.md` and `docs/flash-day-handover-*.md`.
+
+> **Two variants (docs/dev-prod.md)**: dev = `userdebug` + `BUILD_BROKEN_DUP_SYSPROP=true`
+> (adb-root works, playground, CURRENT MAIN GOAL). prod = hardened build + Magisk
+> (added after dev is done). This guide documents the proven debug (dev) flow;
+> prod-variant steps get added when first executed.
 
 ## Hardware requirements
 

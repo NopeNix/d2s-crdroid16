@@ -3,6 +3,18 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-28 (session 10 cont.) — UPDATER IN-PLACE OTA EXERCISE COMPLETE: dev DoD met.
+  User ran Updater app end-to-end (find -> download -> install -> reboot); install_old_timestamp
+  recorded, bootreason reboot,ota, all subsystems green post-update. GOTCHAS: (1) pipeline-r3b.sh
+  used zip file mtime as JSON timestamp -> dev.json said 1793221972 while true build ts was
+  1793200269 (ro.build.date.utc); worked only because both > old ts. FIXED: pipeline now reads
+  post-timestamp from signed META-INF metadata; dev.json corrected. RULE: JSON timestamp must
+  ALWAYS be post-timestamp from signed metadata (= ro.build.date.utc), never file mtime.
+  (2) same-day rebuilds collide on release tag/filename (date-derived); --clobber replaces the
+  asset silently - verify upload byte-accuracy after clobber (tail compare). For future rounds
+  use versioned filenames (e.g. 20261028-2) or include hour in tag when rebuilding same day.
+  (3) Updater DB row status=2=installed; prefs install_old_timestamp/install_again are the
+  authoritative proof of an in-place exercise.
 - 2026-10-28 (session 10) — ROUND 3 already built+flashed by undocumented Oct 27-28
   session (discovered via log timestamps); this session verified device (SPL 2026-10-01,
   adb root uid 0, BT/WiFi/LTE green) and PUBLISHED: release nopenix-dev-13.0-20261028

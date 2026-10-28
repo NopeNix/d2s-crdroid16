@@ -3,6 +3,15 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-28 (session 10) — ROUND 3 already built+flashed by undocumented Oct 27-28
+  session (discovered via log timestamps); this session verified device (SPL 2026-10-01,
+  adb root uid 0, BT/WiFi/LTE green) and PUBLISHED: release nopenix-dev-13.0-20261028
+  (1.5GB zip upload needs detached setsid + poll + --draft=false; interactive gh release
+  create hangs and half-uploads), ota/dev.json updated, release notes added. Updater
+  fetches dev.json and correctly says "not newer" (phone IS round 3) — chain proven,
+  in-place install still pending, options A/B/C in handover-10 (user must pick).
+  ota-json.sh now reads post-timestamp/SPL/SDK from signed META-INF metadata
+  (round-2 zip had NO SYSTEM/etc/prop.default — payloads are .dat.br).
 - 2026-10-28 (session 10) — ota-json.sh FIXED to emit crDroid flat {response:[...]} format (old nested files[] array was rejected by the on-device Updater; dev.json had been hand-edited). Script now also emits os_sdk_level from SYSTEM/etc/prop.default and defaults buildtype to Nightly. Verified with a synthetic zip. Committed 870c591 + pushed to main alongside the docs sweep (ba02f95). Round-3 publish can use the script directly.
 - 2026-10-26 (docs session) — Docs sweep to match handover-9 reality. Fixed stale
   claims across ota.md/branding.md/dev-prod.md/ROADMAP/AGENTS/README/release.md:

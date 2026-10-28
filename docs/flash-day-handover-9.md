@@ -1,5 +1,8 @@
 # Flash-Day Handover #9 — 2026-10-26 ~21:40 UTC (READ THIS ONE FIRST)
 
+> **SUPERSEDED by handover #10 (2026-10-28): round 3 was built, flashed, and published;
+> the round-3 publish + verification this file described as pending is DONE. Read handover-10 first.**
+
 > Supersedes handover #8. Dev line round-2 is ON THE PHONE AND FULLY WORKING.
 
 ## TL;DR — CURRENT STATE

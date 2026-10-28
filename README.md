@@ -47,4 +47,4 @@ v13.0-dev (2026-10-26) is built, signed, flashed, and verified on the device (BT
 WiFi/audio/sensors/S-Pen green, adb root = uid 0, Nopenix branding live, dev OTA
 channel live server-side). Current main goal: finish the dev line (Updater in-place
 OTA exercise + GNSS outdoor test, then round 3 = ASB catch-up) — see
-`docs/flash-day-handover-9.md`. Prod comes after. See `docs/ROADMAP.md`.
+`docs/flash-day-handover-10.md` (round 3 published, SPL 2026-10-01 on device; Updater in-place exercise pending — pick option A/B/C). Prod comes after. See `docs/ROADMAP.md`.

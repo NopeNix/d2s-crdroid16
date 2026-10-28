@@ -3,6 +3,7 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-28 (session 10) — ota-json.sh FIXED to emit crDroid flat {response:[...]} format (old nested files[] array was rejected by the on-device Updater; dev.json had been hand-edited). Script now also emits os_sdk_level from SYSTEM/etc/prop.default and defaults buildtype to Nightly. Verified with a synthetic zip. Committed 870c591 + pushed to main alongside the docs sweep (ba02f95). Round-3 publish can use the script directly.
 - 2026-10-26 (docs session) — Docs sweep to match handover-9 reality. Fixed stale
   claims across ota.md/branding.md/dev-prod.md/ROADMAP/AGENTS/README/release.md:
   updater URL = `updater_server_url` resource overlay (NOT lineage.updater.uri prop),

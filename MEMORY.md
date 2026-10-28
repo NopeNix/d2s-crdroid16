@@ -3,6 +3,10 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
+  DEFINITION OF DONE: MET (boot+debug knobs, full subsystem checklist incl. GNSS,
+  in-place Updater OTA, root). Dev line COMPLETE; prod line work may now start
+  per docs/dev-prod.md (hardening, Magisk wiring, prod channel, banking-app tests).
 - 2026-10-28 (session 10 cont.) — UPDATER IN-PLACE OTA EXERCISE COMPLETE: dev DoD met.
   User ran Updater app end-to-end (find -> download -> install -> reboot); install_old_timestamp
   recorded, bootreason reboot,ota, all subsystems green post-update. GOTCHAS: (1) pipeline-r3b.sh

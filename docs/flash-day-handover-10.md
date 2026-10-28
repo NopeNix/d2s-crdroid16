@@ -1,5 +1,8 @@
 # Flash-Day Handover #10 — 2026-10-28 ~15:50 UTC (READ THIS ONE FIRST)
 
+> **SUPERSEDED by handover #11 (2026-10-28): Updater in-place exercise DONE (owner-driven,
+> success), GNSS outdoor confirmed, DEV DoD MET. Read handover-11 first.**
+
 > Supersedes handover #9. Round 3 (ASB catch-up) is BUILT, FLASHED, and PUBLISHED.
 > One open decision: how to complete the Updater in-place exercise (see below).
 

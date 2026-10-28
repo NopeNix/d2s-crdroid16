@@ -26,7 +26,7 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 - [x] `brunch d2s` succeeds end-to-end
 - [x] Boot test on device (v13.0-dev, handover-9)
 
-## Phase 2 — OTA pipeline 🟡 (dev OTA channel live server-side; in-place install pending)
+## Phase 2 — OTA pipeline 🟢 (dev channel exercised end-to-end in place, 2026-10-28)
 - [x] OTA JSON format documented (flat crDroid 16 format — see ota/README.md + ota.md)
 - [x] v13.0-dev flashed on device (2026-10-26): boots, BT/LTE/WiFi/audio/sensors/S-Pen verified
 - [x] DEV build with debug knobs ON (BUILD_BROKEN_DUP_SYSPROP + WITH_SU → adb root = uid 0) — handover-9
@@ -40,7 +40,7 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
       schema (flagged in ota.md)
 - [ ] Device-tree fixes pushed to NopeNix forks (BT glue, VINTF, SPOOF_SAFETYNET,
       branding, init.debug.rc fate) — handover-9 item 5
-- [ ] GNSS outdoor verification — handover-9 item 4
+- [x] GNSS outdoor verification — owner-confirmed 2026-10-28
 - [ ] PROD line (only after dev is done): hardened user build + Magisk root
       (Zygisk denylist), prod.json channel, GitHub Releases, banking-app tests
       recorded in releases/

@@ -96,18 +96,19 @@ data. Rules:
 - [ ] OTA JSON published to prod.json; Updater installs it in place
 - [ ] Release note in `releases/` with sha256, patch level, app-test results
 
-## Definition of done — dev (current main goal)
+## Definition of done — dev (MET 2026-10-28)
 
-- [ ] Boots with all debug conveniences working (adb root = uid 0, no RSA friction
-      where avoidable)
-- [ ] Subsystem checklist green
-- [ ] OTA flow exercised on the dev channel (Updater finds, downloads, installs
-      a dev build in place)
-- [ ] Root available for diagnosis (Magisk acceptable on dev too if convenient)
+- [x] Boots with all debug conveniences working (adb root = uid 0, no RSA friction)
+- [x] Subsystem checklist green (BT/WiFi/LTE/sensors/S-Pen/camera/GNSS — GNSS
+      outdoor confirmed by owner 2026-10-28)
+- [x] OTA flow exercised on the dev channel: Updater found, downloaded, and
+      installed round-3b in place (2026-10-28; Updater DB status=2,
+      install_old_timestamp=1793135136, bootreason reboot,ota)
+- [x] Root available for diagnosis (su + adb_root in dev builds, uid 0 verified)
 
 ## Sequencing (decided 2026-10-26)
 
 **Current main goal: get the DEV build fully working as desired. Only then move on
 to prod.** Do not start prod work (hardening, Magisk wiring, prod channel) until
 the dev Definition of done is met. The next session's concrete task list is in
-`docs/flash-day-handover-9.md`.
+`docs/flash-day-handover-10.md` + handover-11 notes.

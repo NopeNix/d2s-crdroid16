@@ -43,7 +43,8 @@ used at branch `16.0` (blobs: see `docs/blob-strategy.md`).
 
 ## Status
 
-v13 (2026-10-25) is built, signed, booted, and verified on the device (BT/LTE/WiFi/
-audio/sensors/S-Pen green). Current main goal: the fully working DEV build (debug
-knobs + dev OTA channel exercised) — see `docs/flash-day-handover-8.md`. Prod comes
-after. See `docs/ROADMAP.md`.
+v13.0-dev (2026-10-26) is built, signed, flashed, and verified on the device (BT/LTE/
+WiFi/audio/sensors/S-Pen green, adb root = uid 0, Nopenix branding live, dev OTA
+channel live server-side). Current main goal: finish the dev line (Updater in-place
+OTA exercise + GNSS outdoor test, then round 3 = ASB catch-up) — see
+`docs/flash-day-handover-9.md`. Prod comes after. See `docs/ROADMAP.md`.

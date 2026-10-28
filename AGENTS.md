@@ -17,7 +17,7 @@ continuations only — **no new features**.
 - Known limit (both): unlocked bootloader + own keys ⇒ no Google Play Integrity —
   accepted; applies to every custom ROM on this hardware.
 - Sequencing: get dev fully working first (its Definition of done in docs/dev-prod.md);
-  prod work starts only after. Next-session task list: docs/flash-day-handover-8.md.
+  prod work starts only after. Next-session task list: docs/flash-day-handover-9.md.
 
 ## Repo layout (hub-and-forks model — IMPORTANT)
 

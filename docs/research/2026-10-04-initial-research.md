@@ -24,6 +24,10 @@ Append-only. Each session adds a dated section. These are raw findings backing d
   most 2026 builds, final build switched to stock kernel. VoLTE/VoWiFi never working.
 - Lineage Updater app JSON schema + lineage.updater.uri prop verified from
   crdroidandroid/android_packages_apps_Updater README (and LineageOS equivalent).
+  [LATER CORRECTION 2026-10-26]: the crDroid 16 Updater rewrite does NOT read
+  `lineage.updater.uri` — it reads the `updater_server_url` resource only; and the
+  live JSON schema is flat `{"response":[...]}`, not the README's nested `files[]`.
+  See docs/ota.md + handover-9.
 - XDA thread 4714988 confirms official N10-series crDroid 12 (A16) thread by deuspivete;
   changelog posts match the GitHub changelog file.
 - GitHub runner limits researched: ~84 GB disk / ~7 GB RAM / 6 h — insufficient for this

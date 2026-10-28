@@ -6,7 +6,8 @@ GOAL; its OTA channel (nightly) must be exercised. Prod = the owner's hardened
 daily driver WITH Magisk root (Zygisk denylist for banking), SELinux enforcing,
 encrypted data; patch level tracks upstream ASB. Known limit (both): unlocked
 bootloader + own keys ⇒ no Google Play Integrity — accepted. Authoritative
-next-session task list: `docs/flash-day-handover-8.md`.
+next-session task list: `docs/flash-day-handover-9.md` (round 3: ASB catch-up,
+publish, Updater in-place exercise).
 
 Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 
@@ -16,27 +17,30 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 - [x] Hub repo structure, AGENTS.md, MEMORY.md, docs
 - [x] Local manifest written (manifests/nopenix.xml)
 
-## Phase 1 — First build 🟡 (next!)
-- [ ] Build host prepared (Ubuntu, deps, repo tool) — build-guide.md §1–2
-- [ ] `repo sync` with our local manifest
-- [ ] Blob layout verification: TheMuppets lineage-23.2 vs proprietary-files.txt (blob-strategy.md)
-- [ ] Signing keys generated (signing.md)
-- [ ] Branding wired: version strings, updater URI, zip naming (branding.md)
-- [ ] `brunch d2s` succeeds end-to-end
-- [ ] Boot test on device
+## Phase 1 — First build 🟢 (2026-10-26: v13.0-dev built, signed, flashed, verified)
+- [x] Build host prepared (Ubuntu, deps, repo tool) — build-guide.md §1–2
+- [x] `repo sync` with our local manifest
+- [x] Blob layout verification: TheMuppets lineage-23.2 vs proprietary-files.txt (blob-strategy.md)
+- [x] Signing keys generated (signing.md)
+- [x] Branding wired: version strings, updater URI, zip naming (branding.md — resolved 2026-10-26)
+- [x] `brunch d2s` succeeds end-to-end
+- [x] Boot test on device (v13.0-dev, handover-9)
 
-## Phase 2 — OTA pipeline 🟡 (partially prepared)
-- [x] OTA JSON format documented; ota-json.sh written
-- [x] v13 flashed on device (2026-10-26): boots, BT/LTE/WiFi/audio/sensors/S-Pen verified
-- [ ] DEV build with debug knobs ON (BUILD_BROKEN_DUP_SYSPROP → adb-root works) —
-      current main goal; handover-8 item 3
-- [ ] Variant/branding props: ro.nopenix.variant=dev, ro.lineage.build.version fix,
-      Nopenix display version, nopenix-dev zip naming — handover-8 item 2
-- [ ] Dev OTA channel: ota/dev.json (nightly), lineage.updater.uri, in-place Updater
-      install exercised on dev — handover-8 item 6
+## Phase 2 — OTA pipeline 🟡 (dev OTA channel live server-side; in-place install pending)
+- [x] OTA JSON format documented (flat crDroid 16 format — see ota/README.md + ota.md)
+- [x] v13.0-dev flashed on device (2026-10-26): boots, BT/LTE/WiFi/audio/sensors/S-Pen verified
+- [x] DEV build with debug knobs ON (BUILD_BROKEN_DUP_SYSPROP + WITH_SU → adb root = uid 0) — handover-9
+- [x] Variant/branding props: ro.nopenix.variant=dev, ro.lineage.build.version,
+      display v13.0-YYYYMMDD, nopenix-dev zip naming — handover-9
+- [x] Dev OTA channel server-side: ota/dev.json (flat format) + GitHub release
+      `nopenix-dev-13.0-20261026`; on-device Updater fetched + registered the entry
+- [ ] Updater in-place install exercised on dev (download → install → reboot) —
+      handover-9 item 3
+- [ ] scripts/ota-json.sh still emits old nested files[] format — update to flat
+      schema (flagged in ota.md)
 - [ ] Device-tree fixes pushed to NopeNix forks (BT glue, VINTF, SPOOF_SAFETYNET,
-      branding) — handover-8 item 7
-- [ ] GNSS outdoor verification — handover-8 item 8
+      branding, init.debug.rc fate) — handover-9 item 5
+- [ ] GNSS outdoor verification — handover-9 item 4
 - [ ] PROD line (only after dev is done): hardened user build + Magisk root
       (Zygisk denylist), prod.json channel, GitHub Releases, banking-app tests
       recorded in releases/

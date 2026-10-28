@@ -3,6 +3,13 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-26 (docs session) — Docs sweep to match handover-9 reality. Fixed stale
+  claims across ota.md/branding.md/dev-prod.md/ROADMAP/AGENTS/README/release.md:
+  updater URL = `updater_server_url` resource overlay (NOT lineage.updater.uri prop),
+  JSON = flat `{"response":[...]}` (NOT nested files[]), Updater matches timestamp +
+  os_sdk_level. handover-8 marked SUPERSEDED. GOTCHA: `scripts/ota-json.sh` still
+  emits the OLD nested format — must be updated before next release (flagged in
+  ota.md + release.md; `ota/dev.json` was hand-edited to the correct format).
 
 - 2026-10-26 — SESSION #8 (dev line round 2 COMPLETE; handover-9 pending). v13.0-dev
   built, signed, flashed, verified: adb root=uid0 (WITH_SU=true needed: crDroid adbd

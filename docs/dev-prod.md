@@ -58,10 +58,13 @@
 
 - Two JSON files in this repo: `ota/dev.json` (type `nightly` entries) and
   `ota/prod.json` (type `release` entries).
-- Devices point at their channel via the `lineage.updater.uri` prop baked into each
-  line's build (dev builds get the dev.json URL, prod builds the prod.json URL).
-- The Updater matches `version` (`ro.lineage.build.version`) AND `type`
-  (`ro.lineage.releasetype`) — that self-filtering is the channel mechanism.
+- Devices point at their channel via the **`updater_server_url` string resource**
+  baked into each line's build as a device-tree overlay RRO (crDroid 16 Updater
+  does NOT read the `lineage.updater.uri` runtime prop — verified 2026-10-26,
+  see `docs/ota.md` + `docs/branding.md`).
+- The Updater matches updates by **`timestamp` + `os_sdk_level`** (the JSON
+  `version` field is display-only; the channel split is by URI) — verified
+  2026-10-26, see `docs/ota.md`.
 - **Release policy**: dev zips may be published to dev.json freely (that is the
   point); prod zips go to prod.json + GitHub Releases only after the
   Definition of done below.
@@ -107,4 +110,4 @@ data. Rules:
 **Current main goal: get the DEV build fully working as desired. Only then move on
 to prod.** Do not start prod work (hardening, Magisk wiring, prod channel) until
 the dev Definition of done is met. The next session's concrete task list is in
-`docs/flash-day-handover-8.md`.
+`docs/flash-day-handover-9.md`.

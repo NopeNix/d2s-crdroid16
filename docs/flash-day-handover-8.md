@@ -1,4 +1,11 @@
-# Flash-Day Handover #8 — 2026-10-26 ~15:30 UTC (READ THIS ONE FIRST)
+# Flash-Day Handover #8 — 2026-10-26 ~15:30 UTC
+
+> **SUPERSEDED** by docs/flash-day-handover-9.md (2026-10-26 ~21:40 UTC) — read
+> that one first. This file is kept for historical context only. Its task list
+> was fully executed in the same day's round-2 session: dev build with debug
+> knobs built+flashed+verified, branding props wired, dev OTA channel published,
+> agent-driven flash method proven. The flash recipe mechanics it references
+> live in handover #4 and handover-7.
 
 > Supersedes handover #7. #4 still holds the proven flash recipe mechanics.
 

@@ -4,14 +4,14 @@
       "maintainer": "Nopenix",
       "oem": "Samsung",
       "device": "Galaxy Note10+",
-      "filename": "Nopenix-signed-ota.zip",
-      "download": "https://github.com/NopeNix/d2s-crdroid16/releases/latest/download/Nopenix-signed-ota.zip",
-      "timestamp": 1793044455,
-      "sha256": "e1da56bb0cafae1f3f73f03360a7c9e1d25dcf9e20b142107705955dcce2d6e4",
-      "size": 1518604804,
+      "filename": "Nopenix-dev-13.0-20261028-d2s.zip",
+      "download": "https://github.com/NopeNix/d2s-crdroid16/releases/download/nopenix-dev-13.0-20261028/Nopenix-dev-13.0-20261028-d2s.zip",
+      "timestamp": 1793135136,
+      "sha256": "e40b8fa681d8a0a88d6fa241b5f260f3066c5fc8316d32ef2af7ad3ee8fb6ab6",
+      "size": 1521950513,
       "version": "23.2",
       "buildtype": "Nightly",
-      "os_patch_level": "2026-04-01",
+      "os_patch_level": "2026-10-01",
       "os_sdk_level": 36
     }
   ]

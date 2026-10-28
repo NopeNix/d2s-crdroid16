@@ -19,12 +19,19 @@ BUILDTYPE="${3:-Nightly}"
 ZIP_NAME=$(basename "$ZIP")
 SIZE=$(stat -c%s "$ZIP")
 SHA256=$(sha256sum "$ZIP" | cut -d' ' -f1)
-# Build timestamp from zip mtime (Updater matches on this; must be newer than installed)
-DATETIME=$(stat -c%Y "$ZIP")
-# SPL + SDK level from build prop if present in the zip
-PROPS=$(unzip -p "$ZIP" SYSTEM/etc/prop.default 2>/dev/null || true)
-SPL=$(echo "$PROPS" | grep '^ro.build.version.security_patch=' | cut -d= -f2 || true)
-SDK=$(echo "$PROPS" | grep '^ro.build.version.sdk=' | cut -d= -f2 || true)
+# Prefer the OTA's signed META-INF/com/android/metadata: post-timestamp is the
+# true build timestamp the Updater compares against; SPL/SDK come from the same
+# payload. Fall back to zip mtime / SYSTEM/etc/prop.default if absent.
+META=$(unzip -p "$ZIP" META-INF/com/android/metadata 2>/dev/null || true)
+DATETIME=$(echo "$META" | grep '^post-timestamp=' | cut -d= -f2 || true)
+SPL=$(echo "$META" | grep '^post-security-patch-level=' | cut -d= -f2 || true)
+SDK=$(echo "$META" | grep '^post-sdk-level=' | cut -d= -f2 || true)
+if [ -z "$DATETIME" ]; then DATETIME=$(stat -c%Y "$ZIP"); fi
+if [ -z "$SPL" ] || [ -z "$SDK" ]; then
+  PROPS=$(unzip -p "$ZIP" SYSTEM/etc/prop.default 2>/dev/null || true)
+  if [ -z "$SPL" ]; then SPL=$(echo "$PROPS" | grep '^ro.build.version.security_patch=' | cut -d= -f2 || true); fi
+  if [ -z "$SDK" ]; then SDK=$(echo "$PROPS" | grep '^ro.build.version.sdk=' | cut -d= -f2 || true); fi
+fi
 SPL="${SPL:-unknown}"
 SDK="${SDK:-36}"
 

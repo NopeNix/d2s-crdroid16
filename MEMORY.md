@@ -4,6 +4,44 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 - 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
+- 2026-10-29 (prod session #1 cont.) — FIRST PROD BUILD COMPLETE: build 2h41m
+  (full re-analysis from userdebug→user switch), sign ~80min. Verified signed
+  TF: ro.build.type=user, ro.secure=1, ro.debuggable=0, ro.adb.secure=1,
+  ro.nopenix.variant=prod, init.debug.rc ABSENT. Artifacts:
+  out/signed-target-files.zip (HYPHEN = prod signed TF),
+  out/Nopenix-signed-ota.zip (prod OTA, ts 1793268774, SPL 2026-10-01, SDK 36,
+  sha256 67e11cfc..., size 1514295255), staged as
+  /srv/android/ota61/nopenix-13.0-20261029-d2s.zip. NOT published (prod DoD
+  gate: subsystem+banking tests first). GOTCHAS: (1) run-sign-prod.sh stage-4
+  had a HYPHEN/UNDERSCORE filename typo (signed-target-files.zip vs
+  signed-target_files.zip) — recovery.img got extracted from the STALE dev
+  zip; caught because the "signed" zip still said variant=dev. ALWAYS check
+  the mtimes + variant props of BOTH the TF and signed output before trusting
+  stage outputs. Stage 3 (ota zip) was actually correct (hyphen input).
+  (2) dev round-4-recovery: out/signed-target_files.zip (underscore) on disk
+  is the STALE DEV signed zip — do not trust it for prod. (3) old fork remote
+  URL had embedded dead fine-grained PAT → 403 on push; hub pushes work via
+  SSH — switch fork remotes to git@github.com:. Fork branch
+  nopenix/dev-fixes-16.0 pushed (161e3ea + 7e6128c); hub main pushed
+  (45bc454 prod.json seed, aa4e5fa docs).
+- 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
+- 2026-10-29 (prod session #1) — PROD LINE STARTED (user flavor decided). Done:
+  (a) device fork nopenix/dev-fixes-16.0 commit 161e3ea gates flash-day debug
+  knobs to dev (init.debug.rc copy, ro.debuggable, BUILD_BROKEN_DUP_SYSPROP all
+  ifneq($(NOPENIX_VARIANT),prod)); (b) /srv/android/run-tf-prod.sh wrapper:
+  user flavor, WITH_SU=false, NOPENIX_VARIANT=prod, no WITH_ADB_INSECURE,
+  logs to /srv/android/tf-prod.log; (c) hub ota/prod.json seeded EMPTY
+  {"response":[]} + README note (commit 45bc454, unpushed); (d) docs: build-guide
+  §5a prod deltas, dev-prod Magisk procedure (non-A/B: after every prod OTA
+  reboot, Magisk app Direct Install re-patch restores root; APK + denylist live
+  in /data and survive OTA; userdata wipe = reinstall APK first), ota.md stale
+  nested-files note removed (script was fixed 870c591) — commit aa4e5fa, unpushed.
+  KEY: build/soong gen_build_prop.py flash-day patch is ALREADY variant-aware
+  (gated on BuildBrokenDupSysprop) → prod/user emits ro.secure=1, ro.adb.secure=1,
+  ro.debuggable=0 correctly. First prod build launched 10:12 UTC (pid via
+  run-tf-prod.sh; ~5.5h expected, ccache warm). Fork commits NOT pushed yet
+  (repo rule 6: user OK required for fork pushes).
+- 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
   DEFINITION OF DONE: MET (boot+debug knobs, full subsystem checklist incl. GNSS,
   in-place Updater OTA, root). Dev line COMPLETE; prod line work may now start
   per docs/dev-prod.md (hardening, Magisk wiring, prod channel, banking-app tests).

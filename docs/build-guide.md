@@ -4,9 +4,10 @@
 > `MEMORY.md` and `docs/flash-day-handover-*.md`.
 
 > **Two variants (docs/dev-prod.md)**: dev = `userdebug` + `BUILD_BROKEN_DUP_SYSPROP=true`
-> (adb-root works, playground, CURRENT MAIN GOAL). prod = hardened build + Magisk
-> (added after dev is done). This guide documents the proven debug (dev) flow;
-> prod-variant steps get added when first executed.
+> (adb-root works, playground). prod = **`user`** flavor + Magisk by design (decided
+> 2026-10-29) — hardened daily driver, `WITH_SU=false`, no debug knobs.
+> This guide documents the proven debug (dev) flow; the prod-variant deltas are in
+> §5a below.
 
 ## Hardware requirements
 
@@ -87,6 +88,30 @@ mka bacon -j$(nproc)          # full package
 mka target-files-package      # for proper signed release flow (see docs/signing.md)
 export USE_CCACHE=1 && ccache -M 100G   # big win on rebuilds
 ```
+
+### 5a. Prod-variant build (first execution pending)
+
+Deltas from the dev flow:
+
+1. **Wrapper**: `/srv/android/run-tf-prod.sh` (backgrounds `m target-files-package`
+   into `/srv/android/tf-prod.log`). It sets:
+   - `NOPENIX_VARIANT=prod` → device tree drops `init.debug.rc`, `ro.debuggable`,
+     and `BUILD_BROKEN_DUP_SYSPROP`; `nopenix.mk` points the Updater overlay at
+     `ota/prod.json`; zip names become `nopenix-13.0-<date>-d2s.zip` (no `dev`).
+   - `WITH_SU=false` → no su, no adb_root service.
+   - `lunch lineage_d2s-$aosp_target_release-user` (user flavor; decided 2026-10-29).
+   - No `WITH_ADB_INSECURE` → adb requires RSA auth (normal secure adb).
+2. **Build target**: `m target-files-package` (same as dev) — sign per
+   `docs/signing.md`, then package bacon from the signed target-files if a full
+   zip is needed.
+3. **Post-build verify** (before publishing): from the signed target-files /
+   payload props confirm `ro.nopenix.variant=prod`, `ro.secure=1`,
+   `ro.debuggable=0`, `ro.adb.secure=1`, SELinux enforcing, and that
+   `SYSTEM/etc/init/init.debug.rc` is ABSENT.
+4. **Magisk**: NOT in the build — Magisk is installed on-device by the owner
+   (app + Direct Install boot patch). See docs/dev-prod.md "Magisk procedure".
+5. **Publish gate**: prod DoD checklist (docs/dev-prod.md) must be met before
+   anything lands in `ota/prod.json`.
 
 ## 6. Post-build: OTA JSON + release
 

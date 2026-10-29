@@ -80,11 +80,32 @@ data. Rules:
   session and again before returning to prod** (clean state, no sensitive data
   on dev, as designed). Owner may explicitly accept a carry-over session.
 - Never publish to prod.json anything built from a dirty/experimental tree.
-- After every prod OTA: **Magisk re-patch of the boot image is required before
-  reboot** (our OTA packages rewrite `boot`, which would boot unrooted and may
-  break the Magisk-patched chain). This procedure must be documented in the
-  flash recipe and followed every time. (d2s is non-A/B: dedicated recovery
-  partition.)
+- After every prod OTA: Magisk re-patch of the boot image is required (our OTA
+  packages rewrite `boot`). See "Magisk procedure" below. (d2s is non-A/B:
+  dedicated recovery partition; the Updater reboots straight into the new,
+  unrooted boot — re-patch happens right after that reboot.)
+
+## Magisk procedure (prod)
+
+Magisk is NOT baked into the build. The owner installs it on-device once per
+install, and re-patches boot after every OTA:
+
+1. **First install** (once, per clean install): install the Magisk APK as a
+   normal user app → Magisk → Install → **Direct Install (Recommended)** →
+   reboot. This patches the current boot image in place; the original boot.img
+   backup stays in `/data/adb/` (Magisk-managed).
+2. **After every prod OTA** (d2s is non-A/B, so the Updater reboots straight
+   into the new, unrooted boot): the OTA rewrites `boot`, which wipes the
+   Magisk patch. Root comes back by opening Magisk → Install → **Direct
+   Install** → reboot. Magisk app itself lives in `/data` and survives OTAs
+   (as long as userdata is not wiped); Zygisk denylist config is app-side and
+   also survives.
+3. **If userdata is wiped** (e.g. returning from a dev session): reinstall the
+   Magisk APK first (it is not in the OTA zip), then step 1.
+4. **Banking apps**: Zygisk + denylist must be re-verified after each OTA; the
+   prod release checklist records test results per build.
+5. Emergency unroot: flash the unpatched boot.img from the matching target-files
+   (available in the GitHub release assets) via recovery.
 
 ## Definition of done — prod (release gate)
 

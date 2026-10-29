@@ -92,10 +92,11 @@ the unpacked zip — installs a package without any user menu steps.)
 
 1. Build + sign (docs/signing.md, docs/build-guide.md); prod releases use the
    hardened variant, dev releases the debug variant.
-2. Generate the JSON entry: `scripts/ota-json.sh <zip> [version] [type]`.
-   ⚠ NOTE (2026-10-26): the script still emits the OLD nested `files[]` format —
-   it must be updated to the flat `{"response":[...]}` schema before the next
-   release (open item; `ota/dev.json` was hand-edited to the correct format).
+2. Generate the JSON entry: `scripts/ota-json.sh <zip> [version] [buildtype]`
+   (fixed 2026-10-28, commit 870c591: emits the flat `{"response":[...]}` format
+   and reads post-timestamp/SPL/SDK from the signed META-INF metadata — the old
+   nested-files[] note is obsolete). Prod entries: `buildtype` = `release`,
+   then append the entry object to `ota/prod.json`.
 3. Commit updated `ota/dev.json` (or `ota/prod.json`) + create GitHub release
    with the zip + recovery.img.
 4. Verify with `curl <json url>` and confirm `timestamp` advanced.

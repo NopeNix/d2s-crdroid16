@@ -3,6 +3,22 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30 (channel fix shipped; phone transition staged) — SECOND prod
+  build (ts 1793395784, sha e0e7b924...bf993, 1514693730B) built+signed with
+  channel fix; verify-ota-channel.sh passed on signed TF (prod URL baked).
+  Published: release assets clobbered, prod.json entry updated, TEMP dev.json
+  transition entry added (phone polls dev.json until it runs this build).
+  NEW LESSONS: (1) Updater override URL lives in the VENDOR auto-RRO; the
+  PRODUCT Updater RRO may carry NO url — a check script must union URLs
+  across ALL Updater RROs (nondeterministic find|head -1 caused a false
+  CHANNEL_CHECK_FAILED inside run-sign-prod.sh). (2) grep no-match exit +
+  pipefail can kill a check script before it prints FAIL — always `|| true`.
+  (3) DEVICE_PACKAGE_OVERLAYS dirs MUST mirror the package source path or
+  aapt2 silently drops the override (first rebuild had empty RRO, caught by
+  the check). (4) incremental rebuild after overlay-only change: ~19m build,
+  ~21m sign. NEXT: owner installs via Updater (dev.json offer), confirms,
+  then REMOVE dev.json transition entry + tick release-note DoD boxes.
+
 - 2026-10-30 (channel fix LANDED) — d2s fork ab7eb7c: Updater overlay now
   channel-specific dirs (overlay/updater/{dev,prod}/values/strings.xml) picked
   by DEVICE_PACKAGE_OVERLAYS in nopenix.mk (dead NOPENIX_OTA_URI removed).

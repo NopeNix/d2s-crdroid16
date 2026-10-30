@@ -3,6 +3,25 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30 (channel fix LANDED) — d2s fork ab7eb7c: Updater overlay now
+  channel-specific dirs (overlay/updater/{dev,prod}/values/strings.xml) picked
+  by DEVICE_PACKAGE_OVERLAYS in nopenix.mk (dead NOPENIX_OTA_URI removed).
+  Hub: scripts/verify-ota-channel.sh added + wired as run-sign-prod.sh stage 5
+  (tested: catches the old TF, passes dev). Temp dev.json/prod.json hacks
+  REVERTED (honest ts 1793366117 live again). Prod rebuild launched w/ fix —
+  expect signed RRO to bake prod.json; CHANNEL_CHECK must say OK before publish.
+- 2026-10-30 (ROOT CAUSE: prod phone polls dev.json) — Updater never saw the
+  prod.json ts bump. nopenix.mk computes NOPENIX_OTA_URI per variant but the
+  var is NEVER CONSUMED (only feeds a $(warning)); the overlay strings.xml is
+  hardcoded to dev.json, so EVERY build (incl. prod 20261030) bakes dev.json
+  into the Updater RRO. Proven: strings on prod signed-TF
+  VENDOR/overlay/Updater__aosp_d2s__auto_generated_rro_vendor.apk -> dev.json.
+  Clean fix (proposed): channel-specific overlay dirs + ifeq selection in
+  nopenix.mk; add signed-TF RRO-URL check to pre-publish verification.
+  TRANSITION gotcha: phone keeps polling dev.json until it runs a fixed build,
+  so migrating THIS phone to prod channel needs one recovery flash or one
+  labeled dev.json transition entry.
+
 - 2026-10-30 (prod PUBLISHED, OTA test prep) — Prod release PUBLISHED early
   (owner decision, DoD still open): GitHub release nopenix-13.0-20261030 (zip
   1514692112B + recovery.img 67633152B, both verified byte-exact via API),

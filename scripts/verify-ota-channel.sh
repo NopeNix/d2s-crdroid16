@@ -19,15 +19,22 @@ expected_url="https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/$
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-if ! unzip -q -o "$zip" 'VENDOR/overlay/Updater__*__auto_generated_rro_vendor.apk' -d "$tmp" 2>/dev/null; then
-    echo "FAIL: no Updater vendor RRO found in $zip" >&2
+# The Updater RRO may land under VENDOR/ or PRODUCT/ overlay depending on
+# partition mapping; scan both.
+unzip -q -o "$zip" 'VENDOR/overlay/Updater__*__auto_generated_rro_vendor.apk' 'PRODUCT/overlay/Updater__*__auto_generated_rro_product.apk' -d "$tmp" 2>/dev/null || true
+rro="$(find "$tmp" -name 'Updater__*__auto_generated_rro_*.apk' | head -1)"
+if [ -z "$rro" ]; then
+    echo "FAIL: no Updater RRO found in $zip" >&2
     exit 1
 fi
 
-baked_url="$(strings "$tmp"/VENDOR/overlay/Updater__*__auto_generated_rro_vendor.apk \
+# URL is stored in resources.arsc; grep the arsc stream (covers ascii and
+# utf16le via the raw substring match).
+baked_url="$(unzip -p "$rro" resources.arsc \
+    | strings \
     | grep -o 'https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/[a-z]*\.json' | head -1)"
 if [ -z "$baked_url" ]; then
-    echo "FAIL: Updater RRO has no recognizable ota/*.json URL" >&2
+    echo "FAIL: Updater RRO has NO ota/*.json URL baked in (overlay dropped — check DEVICE_PACKAGE_OVERLAYS mirror path)" >&2
     exit 1
 fi
 if [ "$baked_url" != "$expected_url" ]; then

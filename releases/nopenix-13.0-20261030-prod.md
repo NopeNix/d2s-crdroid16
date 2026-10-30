@@ -10,14 +10,15 @@
 | Field | Value |
 |---|---|
 | Zip | `nopenix-13.0-20261030-d2s.zip` |
-| Size | 1,514,692,112 bytes |
-| SHA-256 | `b8dd62f64de4caf07b7b70f5cc73724d8715222ee5e7e0d2e086d45aac924511` |
-| Post-timestamp | `1793366117` (2026-10-30 13:15 UTC build) |
+| Size | 1,514,693,730 bytes |
+| SHA-256 | `e0e7b924cb91a56ca4837e883b1764ff81af2fe02a2fa0ec24442573152bf993` |
+| Post-timestamp | `1793395784` (2026-10-30 21:29 UTC build) |
 | SPL / SDK | 2026-10-01 / 36 |
 | Buildtype | Release (prod channel) |
 | Variant | `ro.nopenix.variant=prod` |
 | Base | crDroid 16.0 / Lineage 23.2, **user flavor** (first prod line build ever) |
 | Includes | Audio fix (`1d502b6`, SLSI primary HAL now built — see handover-13) |
+| | **Updater channel fix** (d2s `88bd604`: Updater RRO now bakes `ota/prod.json` for prod — see below) |
 
 ## Hardening verification (on-device, post-flash)
 
@@ -76,3 +77,34 @@ impact: speakerphone/in-call volume path. Verify during a call; investigate in
 - Signed recovery: `/srv/android/nopenix-d2s/out/Nopenix-recovery-signed.img`
 - STALE pre-audio-fix prod zip archived as
   `/srv/android/ota61/STALE-audio-broken-20261029-d2s.zip` (do NOT publish)
+- STALE first prod zip (baked dev.json channel URL — the bug this rebuild
+  fixes) archived as `/srv/android/ota61/STALE-dev-channel-baked-20261030-d2s.zip`
+
+## Updater channel fix + rebuild (same day, second prod build)
+
+Root cause of the missed prod.json update: `nopenix.mk` computed the channel
+URL into `NOPENIX_OTA_URI` but never consumed it — the overlay `strings.xml`
+was hardcoded to `ota/dev.json`, so EVERY build (prod included) baked the dev
+channel into the Updater auto-RRO. Proven via `strings` on the signed-TF RRO.
+
+Fix (d2s `88bd604`): channel-specific overlay dirs
+`overlay/updater/{dev,prod}/packages/apps/Updater/.../strings.xml`, selected
+via `DEVICE_PACKAGE_OVERLAYS` in `nopenix.mk`. NOTE: the overlay path must
+mirror the target package's source path or aapt2 silently drops the override
+(first rebuild had this; caught by the new check script).
+
+New mandatory pre-publish gate: `scripts/verify-ota-channel.sh <signed-tf>
+<channel>` (wired as `run-sign-prod.sh` stage 5) — asserts the Updater RRO
+bakes the intended channel URL; FAILs on mismatch, missing URL, or conflicting
+URLs. It caught both failure modes above before publish.
+
+## OTA install (planned test)
+
+1. Phone (running the stale dev-channel-baked prod build, ts 1793366117)
+   polls `ota/dev.json` → gets offered this build via a temporary dev.json
+   transition entry (same filename/sha/ts 1793395784).
+2. In-place install via Updater (same signing keys; data preserved). NOTE:
+   this OTA's updater binary rewrite does NOT change the phone's baked URL
+   (RRO ships in system/vendor partition) — after reboot the phone runs a
+   build whose baked URL IS prod.json. Transition entry then removed.
+3. From then on the phone is a prod-channel device permanently.

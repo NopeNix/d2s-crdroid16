@@ -1,13 +1,15 @@
 # ROADMAP — status and next steps
 
 **Two build lines (decided 2026-10-26, docs/dev-prod.md): DEV then PROD.**
-Dev = open debug playground (userdebug + debug knobs, adb-root), the CURRENT MAIN
-GOAL; its OTA channel (nightly) must be exercised. Prod = the owner's hardened
-daily driver WITH Magisk root (Zygisk denylist for banking), SELinux enforcing,
-encrypted data; patch level tracks upstream ASB. Known limit (both): unlocked
-bootloader + own keys ⇒ no Google Play Integrity — accepted. Authoritative
-next-session task list: `docs/flash-day-handover-9.md` (round 3: ASB catch-up,
-publish, Updater in-place exercise).
+**DEV line: COMPLETE and green incl. audio** (nopenix-dev-13.0-20261030
+installed in place via Updater, owner-confirmed 2026-10-30). **PROD line is
+now the main goal** — resume per `docs/flash-day-handover-13.md` (rebuild prod
+with the audio fix, dev→prod flash, Magisk, banking tests, publish prod.json).
+Dev = open debug playground (userdebug + debug knobs, adb-root); prod = the
+owner's hardened daily driver WITH Magisk root (Zygisk denylist for banking),
+SELinux enforcing, encrypted data; patch level tracks upstream ASB. Known
+limit (both): unlocked bootloader + own keys ⇒ no Google Play Integrity —
+accepted.
 
 Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 
@@ -34,16 +36,25 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
       display v13.0-YYYYMMDD, nopenix-dev zip naming — handover-9
 - [x] Dev OTA channel server-side: ota/dev.json (flat format) + GitHub release
       `nopenix-dev-13.0-20261026`; on-device Updater fetched + registered the entry
-- [ ] Updater in-place install exercised on dev (download → install → reboot) —
-      handover-9 item 3
-- [ ] scripts/ota-json.sh still emits old nested files[] format — update to flat
-      schema (flagged in ota.md)
-- [ ] Device-tree fixes pushed to NopeNix forks (BT glue, VINTF, SPOOF_SAFETYNET,
-      branding, init.debug.rc fate) — handover-9 item 5
+- [x] Updater in-place install exercised on dev (download → install → reboot) —
+      round-3b (2026-10-28); re-exercised with a real fix 2026-10-30
+- [x] scripts/ota-json.sh emits flat crDroid 16 schema (fixed 2026-10-28, commit 870c591)
+- [x] Device-tree fixes pushed to NopeNix forks (VINTF, BT glue, HAL renames,
+      branding, variant gates 161e3ea, audio HAL fix 1d502b6) — note: the
+      exynos9820-common branch only actually landed on the remote 2026-10-30
+      (earlier push was defeated by a dead PAT)
 - [x] GNSS outdoor verification — owner-confirmed 2026-10-28
-- [ ] PROD line (only after dev is done): hardened user build + Magisk root
-      (Zygisk denylist), prod.json channel, GitHub Releases, banking-app tests
-      recorded in releases/
+- [x] Audio subsystem on dev — root cause found (SLSI audio HAL never built),
+      fixed, released (nopenix-dev-13.0-20261030), owner-confirmed 2026-10-30
+
+## Phase 2b — PROD line 🟡 (in progress; audio blocker cleared 2026-10-30)
+- [x] Prod flavor decided (user), variant gates in forks (161e3ea), first prod
+      build built+signed 2026-10-29 (artifacts staged, NOT published)
+- [ ] REBUILD PROD with the audio fix (staged 20261029 prod zip is stale) —
+      handover-13 §2 step 1
+- [ ] Flash dev→prod (wipe userdata), Magisk Direct Install + Zygisk denylist
+- [ ] Subsystem checklist + owner banking-app tests recorded in releases/
+- [ ] Publish ota/prod.json + GitHub release (buildtype Release)
 
 ## Phase 3 — Security-patch cadence 🟪 (routine) — HARD REQUIREMENT for daily driver
 - [ ] Monthly: `repo sync` crDroid 16.0 upstream → rebuild → release (patch-level bump)

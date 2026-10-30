@@ -129,7 +129,6 @@ install, and re-patches boot after every OTA:
 
 ## Sequencing (decided 2026-10-26)
 
-**Current main goal: get the DEV build fully working as desired. Only then move on
-to prod.** Do not start prod work (hardening, Magisk wiring, prod channel) until
-the dev Definition of done is met. The next session's concrete task list is in
-`docs/flash-day-handover-10.md` + handover-11 notes.
+**Current main goal: the PROD line** (dev is done, DoD met 2026-10-28, audio
+fixed + owner-confirmed 2026-10-30). The next session's concrete task list is in
+`docs/flash-day-handover-13.md`.

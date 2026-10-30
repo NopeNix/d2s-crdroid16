@@ -1,12 +1,18 @@
-# Handover #12 — 2026-10-29 ~20:15 UTC (READ THIS ONE FIRST)
+# Handover #12 — 2026-10-29 ~20:15 UTC
 
-> **DETOUR IN PROGRESS**: owner found **audio is not working** on the dev build
-> currently on the phone (round-3b, 2026-10-28). A separate agent is being
-> dispatched to fix audio. **Audio is now a release blocker for BOTH lines** —
-> the prod DoD subsystem checklist requires audio green, so the prod flash/
-> publish is ON HOLD until the detour resolves.
->
-> ⚠️ Do NOT start the prod flash while audio is broken.
+> **SUPERSEDED by docs/flash-day-handover-13.md (2026-10-30)** — the audio
+> detour described below was completed the next day (root cause: SLSI audio HAL
+> never built; fix = soong namespace + exynos_audio vars, fork commit 1d502b6;
+> released as nopenix-dev-13.0-20261030, owner-confirmed). **Read handover-13
+> for the current state and the prod-line task list.** This file is kept for
+> the prod-build artifact paths and sign-script gotchas (§2, §3), which still
+> apply.
+
+> Original status (2026-10-29): **DETOUR IN PROGRESS**: owner found **audio is
+> not working** on the dev build currently on the phone (round-3b, 2026-10-28).
+> A separate agent was dispatched to fix audio. Audio was a release blocker
+> for BOTH lines — the prod DoD subsystem checklist requires audio green, so
+> the prod flash/publish was ON HOLD until the detour resolved.
 
 ## 1. Project in 60 seconds (for the incoming audio agent)
 

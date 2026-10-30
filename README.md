@@ -43,8 +43,4 @@ used at branch `16.0` (blobs: see `docs/blob-strategy.md`).
 
 ## Status
 
-v13.0-dev (2026-10-26) is built, signed, flashed, and verified on the device (BT/LTE/
-WiFi/audio/sensors/S-Pen green, adb root = uid 0, Nopenix branding live, dev OTA
-channel live server-side). Current main goal: finish the dev line (Updater in-place
-OTA exercise + GNSS outdoor test, then round 3 = ASB catch-up) — see
-**DEV LINE COMPLETE (DoD met 2026-10-28)**: SPL 2026-10-01, all subsystems incl. GNSS green, Updater in-place OTA proven end-to-end. Now: prod line per `docs/flash-day-handover-11.md`. See `docs/ROADMAP.md`.
+**DEV LINE COMPLETE (DoD met 2026-10-28; audio fixed + owner-confirmed 2026-10-30)**: SPL 2026-10-01, all subsystems green, Updater in-place OTA proven end-to-end (latest dev release installed in place 2026-10-30). Now: prod line per `docs/flash-day-handover-13.md`. See `docs/ROADMAP.md`.

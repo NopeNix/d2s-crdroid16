@@ -1,9 +1,9 @@
 # Release: nopenix-13.0-20261030 (PROD, first prod build)
 
-> **Status: FLASHED on device, verification IN PROGRESS.** Not yet published to
-> GitHub Releases / `ota/prod.json` — prod DoD gate still open (Magisk + denylist
-> pending, banking-app tests pending, full subsystem sign-off pending).
-> This note is the draft record of the build; publish items get ticked when done.
+> **Status: PUBLISHED to GitHub Releases + `ota/prod.json` (2026-10-30).** The
+> remaining DoD boxes (Magisk + denylist, banking apps, owner functional pass)
+> are still open and tracked below — publish was pulled forward deliberately
+> (owner decision) to exercise the prod OTA chain in-place via the Updater app.
 
 ## Build facts
 
@@ -65,7 +65,8 @@ impact: speakerphone/in-call volume path. Verify during a call; investigate in
 - [ ] Magisk installed + Zygisk denylist configured for banking apps
 - [ ] Subsystem checklist green (owner functional pass incl. call audio watch item)
 - [ ] Owner's banking apps tested; results recorded here
-- [ ] OTA JSON published to prod.json; Updater installs it in place
+- [x] OTA JSON published to prod.json (2026-10-30); Updater in-place install pending owner test
+- [x] GitHub release `nopenix-13.0-20261030` published (zip + recovery.img)
 - [x] Release note (this file)
 
 ## Artifacts on host

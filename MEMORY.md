@@ -3,6 +3,17 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30 (audio detour, FIX SHIPPED) — Audio-fix dev release PUBLISHED:
+  nopenix-dev-13.0-20261030 (ts 1793348962, SPL 2026-10-01, sha256 c2ac045f...,
+  1522236417 bytes) + ota/dev.json + release note (releases/nopenix-13.0-20261030-dev.md),
+  hub main pushed 7d26c34. Signed TF verified: audio.primary.universal9825.so +
+  libaudio-ril.so + libaudioproxy.so in vendor/lib64, links confirmed in soong ninja
+  (PROXY_LIBRARY worked). ro.build.type=user + ro.debuggable=1 on the signed dev zip
+  is NORMAL (matches round-3b phone baseline). Common-tree fork push required remote
+  re-set to SSH again (embedded PAT 403) — fix: git remote set-url github
+  git@github.com:NopeNix/<repo>.git. PENDING: owner installs OTA via Updater
+  (in-place exercise) and CONFIRMS AUDIO; if green, prod line resumes (rebuild prod
+  with the fix, then flash/Magisk/checklist per handover-12 §3).
 - 2026-10-30 (audio detour, diagnosis complete) — AUDIO ROOT CAUSE: SLSI primary HAL
   never built. Phone+build ship only AOSP audio.primary.default.so; audio.primary.universal9825.so
   missing because hardware/samsung_slsi-linaro/exynos/libaudio/{audiohal,audiohal_comv1} declare

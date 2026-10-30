@@ -2,9 +2,10 @@
 
 **Two build lines (decided 2026-10-26, docs/dev-prod.md): DEV then PROD.**
 **DEV line: COMPLETE and green incl. audio** (nopenix-dev-13.0-20261030
-installed in place via Updater, owner-confirmed 2026-10-30). **PROD line is
-now the main goal** — resume per `docs/flash-day-handover-13.md` (rebuild prod
-with the audio fix, dev→prod flash, Magisk, banking tests, publish prod.json).
+installed in place via Updater, owner-confirmed 2026-10-30). **PROD line:
+first prod build FLASHED and BOOTED on the phone (2026-10-30)** — see
+`docs/flash-day-handover-14.md` (supersedes 13). Remaining: Magisk + banking
+tests, then publish prod.json.
 Dev = open debug playground (userdebug + debug knobs, adb-root); prod = the
 owner's hardened daily driver WITH Magisk root (Zygisk denylist for banking),
 SELinux enforcing, encrypted data; patch level tracks upstream ASB. Known
@@ -47,14 +48,18 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 - [x] Audio subsystem on dev — root cause found (SLSI audio HAL never built),
       fixed, released (nopenix-dev-13.0-20261030), owner-confirmed 2026-10-30
 
-## Phase 2b — PROD line 🟡 (in progress; audio blocker cleared 2026-10-30)
-- [x] Prod flavor decided (user), variant gates in forks (161e3ea), first prod
-      build built+signed 2026-10-29 (artifacts staged, NOT published)
-- [ ] REBUILD PROD with the audio fix (staged 20261029 prod zip is stale) —
-      handover-13 §2 step 1
-- [ ] Flash dev→prod (wipe userdata), Magisk Direct Install + Zygisk denylist
+## Phase 2b — PROD line 🟡 (in progress; prod flashed 2026-10-30)
+- [x] Prod flavor decided (user), variant gates in forks (161e3ea)
+- [x] First prod build (2026-10-29, staged artifacts) — superseded by audio fix
+- [x] REBUILD PROD with the audio fix (2h22m build + sign 2026-10-30); stale
+      20261029 zip archived as STALE-audio-broken-20261029-d2s.zip
+- [x] Flash dev→prod (userdata wiped, owner-authorized x2 gates), prod booted,
+      hardened props verified on device, full log audit clean — handover-14
+- [ ] Magisk Direct Install + Zygisk denylist (owner; also finish Setup Wizard)
+- [ ] Watch item: ABOX Spk AmpL mixer control — verify speakerphone/in-call audio
 - [ ] Subsystem checklist + owner banking-app tests recorded in releases/
-- [ ] Publish ota/prod.json + GitHub release (buildtype Release)
+- [ ] Publish ota/prod.json + GitHub release (buildtype Release) — entry ready
+      (handover-14 §3), release note drafted (releases/nopenix-13.0-20261030-prod.md)
 
 ## Phase 3 — Security-patch cadence 🟪 (routine) — HARD REQUIREMENT for daily driver
 - [ ] Monthly: `repo sync` crDroid 16.0 upstream → rebuild → release (patch-level bump)

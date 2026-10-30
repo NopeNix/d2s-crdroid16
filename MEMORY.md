@@ -8,6 +8,24 @@
   fully validated on device. Audio blocker CLEARED for both lines → prod line
   may resume per handover-12 §3 (rebuild prod with the fix, dev→prod flash,
   Magisk, subsystem+banking checklist, then publish prod.json).
+- 2026-10-30 (prod session #2) — PROD FLASHED AND BOOTED (first prod ever):
+  rebuilt with audio fix (2h22m), signed (~30min, stage-4 typo FIXED first),
+  verified (prod props + audio HAL 32/64-bit in signed TF), staged
+  ota61/nopenix-13.0-20261030-d2s.zip sha256 b8dd62f6...24511 ts 1793366117,
+  FLASHED: adb reboot recovery -> /data wiped (OWNER AUTHORIZED — see standing
+  rule above) -> 4x400MB chunks md5-verified @46MB/s -> assembled sha256 match
+  -> update-binary script succeeded (sys/vendor/product/odm/vbmeta) -> cleanup
+  -> reboot. GOTCHAS: (1) `adb reboot` from recovery LOOPS BACK to recovery —
+  let owner pick "Reboot system now" from the menu. (2) recovery itself asks
+  owner to confirm data deletion = second consent gate, good. (3) do NOT call
+  `adb root` twice in recovery: second root-restart kills adbd, device drops
+  off adb until owner interacts. (4) first prod boot CLEAN: 0 crashes/ANRs/
+  tombstones, SELinux enforcing, 2 avc denials both from agent shell. (5)
+  WATCH ITEM: `audio_hw_proxy: cannot find ABOX Spk AmpL Power Mixer Control`
+  — media routes fine, verify speakerphone/in-call audio; investigate in
+  exynos9820-common if call audio broken. Prod DoD gate OPEN: Magisk Direct
+  Install + Zygisk denylist + banking tests pending; prod.json entry + release
+  note READY (handover-14 §3). Docs: handover-14 + releases/nopenix-13.0-20261030-prod.md.
 - 2026-10-30 (audio detour, FIX SHIPPED) — Audio-fix dev release PUBLISHED:
   nopenix-dev-13.0-20261030 (ts 1793348962, SPL 2026-10-01, sha256 c2ac045f...,
   1522236417 bytes) + ota/dev.json + release note (releases/nopenix-13.0-20261030-dev.md),

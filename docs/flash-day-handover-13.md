@@ -1,4 +1,8 @@
-# Handover #13 — 2026-10-30 ~13:00 UTC (READ THIS ONE FIRST)
+# Handover #13 — 2026-10-30 ~13:00 UTC
+
+> **SUPERSEDED by handover #14 (2026-10-30 ~19:30 UTC): prod rebuilt with the
+> audio fix, FLASHED, booted, verified. DoD gate open (Magisk + banking tests).
+> Read handover-14 first.**
 
 > **AUDIO DETOUR CLOSED.** Owner confirmed working audio on the phone after the
 > in-place Updater OTA to `nopenix-dev-13.0-20261030`. The blocker from

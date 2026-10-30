@@ -3,6 +3,17 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30 (prod PUBLISHED, OTA test prep) — Prod release PUBLISHED early
+  (owner decision, DoD still open): GitHub release nopenix-13.0-20261030 (zip
+  1514692112B + recovery.img 67633152B, both verified byte-exact via API),
+  ota/prod.json appended + hub main pushed 0b3dbc3. Verified the phone path:
+  raw prod.json serves the entry; releases/latest/download 302->302->200 with
+  content-length == entry size. GOTCHA: phone already runs THIS build
+  (ts 1793366117) — Updater only offers entries with a NEWER timestamp, so
+  prod.json as-is shows "up to date". To exercise prod OTA install now:
+  temporarily bump ts in prod.json (same zip reinstalls in place, data kept),
+  then restore honest ts. Remember Magisk re-patch after any prod OTA reboot.
+
 - 2026-10-30 (audio detour CLOSED) — OWNER CONFIRMED AUDIO WORKS on
   nopenix-dev-13.0-20261030 (in-place Updater OTA install). Root cause + fix
   fully validated on device. Audio blocker CLEARED for both lines → prod line

@@ -4,6 +4,12 @@
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
 - 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
+- 2026-10-29 (prod session #1 final) — AUDIO BROKEN on phone (owner-reported,
+  dev round-3b). DETOUR: separate audio-fix agent dispatched. Prod flash/publish
+  ON HOLD (audio is in the prod DoD subsystem checklist). Handover-12 written:
+  docs/flash-day-handover-12.md — full prod-session state, artifact paths,
+  gotchas, audio-context section (which trees/blobs to check, adb root how-to
+  on the current dev build). Next main-line session: READ HANDOVER-12 FIRST.
 - 2026-10-29 (prod session #1 cont.) — FIRST PROD BUILD COMPLETE: build 2h41m
   (full re-analysis from userdebug→user switch), sign ~80min. Verified signed
   TF: ro.build.type=user, ro.secure=1, ro.debuggable=0, ro.adb.secure=1,

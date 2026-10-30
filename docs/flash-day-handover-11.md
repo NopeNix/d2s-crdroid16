@@ -1,4 +1,7 @@
-# Flash-Day Handover #11 — 2026-10-28 ~22:25 UTC (READ THIS ONE FIRST)
+# Flash-Day Handover #11 — 2026-10-28 ~22:25 UTC
+
+> **SUPERSEDED by handover #12 (2026-10-29): audio broken on dev → detour;
+> prod flash/publish ON HOLD. Read handover-12 first.**
 
 > Supersedes handover #10. **DEV LINE DEFINITION OF DONE: MET.**
 > The dev line is COMPLETE. Next phase: prod line (docs/dev-prod.md).

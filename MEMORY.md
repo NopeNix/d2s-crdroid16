@@ -3,6 +3,19 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30 (audio detour, diagnosis complete) — AUDIO ROOT CAUSE: SLSI primary HAL
+  never built. Phone+build ship only AOSP audio.primary.default.so; audio.primary.universal9825.so
+  missing because hardware/samsung_slsi-linaro/exynos/libaudio/{audiohal,audiohal_comv1} declare
+  their own soong_namespace{} and are NOT in PRODUCT_SOONG_NAMESPACES (same class as gralloc3 bug).
+  Proof: out/soong/.intermediates/hardware/samsung_slsi-linaro/exynos/ has no libaudio dir;
+  gralloc.universal9825.so built OK. Generic default HAL opens PCM0p and writes frames
+  (AudioFlinger: 12.7M frames, hw status 0) but does zero Samsung routing (no mixer_paths,
+  no ABox/madera setup) → silence. KNOWN-GOOD FIX (LineageOS lineage-23.2 d2s official):
+  (1) common.mk PRODUCT_SOONG_NAMESPACES += hardware/samsung_slsi-linaro/exynos/libaudio/audiohal
+  (2) BoardConfigCommon.mk: $(call soong_config_set,exynos_audio,PROXY_LIBRARY,//device/samsung/exynos9820-common:libaudioproxy)
+      and $(call soong_config_set,exynos_audio,PREDEFINED_LOW_CAPTURE_DURATION,20) —
+      BOARD_LOW_LATENCY_CAPTURE_DURATION:=20 is set upstream but never wired into soong.
+  libaudioproxy (device tree audio/proxy) already builds fine. FIX NOT YET APPLIED.
 - 2026-10-28 (session 10 final) — GNSS OUTDOOR CONFIRMED by owner. DEV LINE
 - 2026-10-29 (prod session #1 final) — AUDIO BROKEN on phone (owner-reported,
   dev round-3b). DETOUR: separate audio-fix agent dispatched. Prod flash/publish

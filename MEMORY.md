@@ -629,3 +629,7 @@
   available Android ASB + latest patches of all other components we can get.** Apply to
   both build lines, every build, from now on. Next build should start with
   `repo sync` of crDroid 16.0 upstream to pick up new SPL (current base: 2026-04-01).
+- 2026-10-30 (prod flash session) — STANDING RULE from owner: ALWAYS ask
+  permission before wiping /data, every time, even when policy says wipe
+  (e.g. dev->prod transition). Owner confirmed wipe OK for THIS transition
+  only. Never format /data without an explicit fresh OK in that session.

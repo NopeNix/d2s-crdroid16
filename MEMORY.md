@@ -3,6 +3,28 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-31 (UNIFIED BUILD PIPELINE LIVE — runner + canonical script) —
+  `scripts/nopenix-build.sh` is THE entry point for both hand-runs and the
+  self-hosted Actions runner (label `d2s`, service
+  `nopenix-runner.service`, linger on; runner dir
+  `/srv/android/actions-runner`). Triggers: workflow_dispatch + `build/*`
+  tags only — NEVER pull_request (keys on host). Gotchas that bit today:
+  (1) AOSP `envsetup.sh` reads `$TOP` before defining it → source it with
+  `set +u` or the script dies instantly;
+  (2) `vendor/lineage/vars/aosp_target_release` has a comment line — raw
+  `cat` feeds `lunch` garbage; parse with
+  `sed -n "s/^aosp_target_release=//p"`;
+  (3) the runner's PATH resolves `python3` to `/usr/bin/python3` which has
+  NO protobuf/six — releasetools needs a stable venv, now at
+  `/srv/android/venv-releasetools` (protobuf 7.36.2 + six, with
+  `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` already exported);
+  (4) staging/copy paths must be anchored at `$SRC` — relative `out/…`
+  resolves against the caller's cwd, not the build tree;
+  (5) first full prod+dev run via Actions: GREEN (prod TF 2h24m, sign ~30m).
+  Artifacts always stage to `/srv/android/ota61/staging/<variant>/` with
+  SHA256SUMS; publish stays a human step.
+
+
 - 2026-10-30/31 (PROD OTA EXERCISE COMPLETE) — First prod in-place OTA
   SUCCEEDED: phone offered new build via TEMP dev.json entry, installed via
   Updater, rebooted clean. On-device verified: ts 1793395784, variant=prod,

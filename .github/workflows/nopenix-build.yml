@@ -28,6 +28,11 @@ on:
         required: false
         default: false
         type: boolean
+      sign-only:
+        description: 'reuse existing TF zips, only sign + OTA + stage (no rebuild)'
+        required: false
+        default: false
+        type: boolean
   push:
     tags:
       - 'build/*'
@@ -63,6 +68,7 @@ jobs:
           [ -z "$VARIANT" ] && VARIANT=both
           SYNC_FLAG=""
           if [ "${{ inputs.sync-first }}" = "true" ]; then SYNC_FLAG=--sync-first; fi
+          if [ "${{ inputs.sign-only }}" = "true" ]; then SYNC_FLAG="$SYNC_FLAG --sign-only"; fi
           bash scripts/nopenix-build.sh --variant "$VARIANT" $SYNC_FLAG
 
       - name: Summary

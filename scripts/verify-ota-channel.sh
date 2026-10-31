@@ -20,23 +20,30 @@ expected_url="https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/$
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 # The Updater RRO may land under VENDOR/ or PRODUCT/ overlay depending on
-# partition mapping; scan both.
+# partition mapping; scan both. The URL override lives in the vendor RRO;
+# the product one may carry no URL (not an error by itself).
 unzip -q -o "$zip" 'VENDOR/overlay/Updater__*__auto_generated_rro_vendor.apk' 'PRODUCT/overlay/Updater__*__auto_generated_rro_product.apk' -d "$tmp" 2>/dev/null || true
-rro="$(find "$tmp" -name 'Updater__*__auto_generated_rro_*.apk' | head -1)"
-if [ -z "$rro" ]; then
+rros="$(find "$tmp" -name 'Updater__*__auto_generated_rro_*.apk')"
+if [ -z "$rros" ]; then
     echo "FAIL: no Updater RRO found in $zip" >&2
     exit 1
 fi
 
-# URL is stored in resources.arsc; grep the arsc stream (covers ascii and
-# utf16le via the raw substring match).
-baked_url="$(unzip -p "$rro" resources.arsc \
-    | strings \
-    | grep -o 'https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/[a-z]*\.json' | head -1)"
-if [ -z "$baked_url" ]; then
-    echo "FAIL: Updater RRO has NO ota/*.json URL baked in (overlay dropped — check DEVICE_PACKAGE_OVERLAYS mirror path)" >&2
+# Union of URLs across ALL Updater RROs. grep's no-match exit status must
+# not kill the pipeline (set -o pipefail).
+urls="$(for rro in $rros; do
+    unzip -p "$rro" resources.arsc 2>/dev/null | strings \
+      | grep -o 'https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/[a-z]*\.json' || true
+done | sort -u)"
+if [ -z "$urls" ]; then
+    echo "FAIL: no Updater RRO has an ota/*.json URL baked in (overlay dropped — check DEVICE_PACKAGE_OVERLAYS mirror path)" >&2
     exit 1
 fi
+if [ "$(echo "$urls" | wc -l)" -gt 1 ]; then
+    echo "FAIL: conflicting URLs baked across Updater RROs: $urls" >&2
+    exit 1
+fi
+baked_url="$urls"
 if [ "$baked_url" != "$expected_url" ]; then
     echo "FAIL: channel mismatch — RRO bakes '$baked_url', expected '$expected_url'" >&2
     exit 1

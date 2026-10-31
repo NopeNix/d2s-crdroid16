@@ -66,7 +66,7 @@ impact: speakerphone/in-call volume path. Verify during a call; investigate in
 - [ ] Magisk installed + Zygisk denylist configured for banking apps
 - [ ] Subsystem checklist green (owner functional pass incl. call audio watch item)
 - [ ] Owner's banking apps tested; results recorded here
-- [x] OTA JSON published to prod.json (2026-10-30); Updater in-place install pending owner test
+- [x] OTA JSON published to prod.json (2026-10-30); in-place OTA install VERIFIED on device (ts 1793395784 build installed via Updater, rebooted clean)
 - [x] GitHub release `nopenix-13.0-20261030` published (zip + recovery.img)
 - [x] Release note (this file)
 

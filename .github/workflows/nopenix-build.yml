@@ -1,0 +1,79 @@
+# nopenix-build.yml — self-hosted runner build pipeline for the d2s ROM.
+#
+# IMPORTANT design decisions (docs/nopenix-build.md):
+#   - The runner and a local hand-run call the SAME canonical script
+#     (scripts/nopenix-build.sh) — same source tree, ccache, dirs, keys.
+#   - The runner stops at STAGED artifacts (/srv/android/ota61/staging/).
+#     Publishing (ota/*.json, GitHub Releases) stays a human step per the
+#     prod DoD gate (docs/dev-prod.md).
+#   - NEVER trigger on pull_request: the workflow drives local signing keys
+#     and a shared build tree. Owner-only manual dispatch + tag push only.
+#   - Sequential dev -> prod so both share the warm ccache; recovery.img for
+#     BOTH variants is always produced (the OTA rewrites the boot image, and
+#     recovery is the flash-day fallback image for both channels).
+
+name: nopenix-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: 'Which line(s) to build'
+        required: false
+        default: 'both'
+        type: choice
+        options: [dev, prod, both]
+      sync-first:
+        description: 'repo sync before building (upstream + forks)'
+        required: false
+        default: false
+        type: boolean
+  push:
+    tags:
+      - 'build/*'
+
+concurrency:
+  group: nopenix-build
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # Locked to this host's runner label; the runner runs as the build user.
+    runs-on: [self-hosted, d2s]
+    timeout-minutes: 600
+    steps:
+      - name: Checkout hub (scripts + verify gate)
+        uses: actions/checkout@v4
+
+      - name: Preflight
+        run: |
+          set -euo pipefail
+          echo "runner: $(whoami)@$(hostname)"
+          df -h /srv | tail -1
+          test -d /srv/android/nopenix-d2s/.repo || { echo "source tree missing"; exit 1; }
+          test -d "$HOME/.android-certs" || { echo "keys missing"; exit 1; }
+
+      - name: Build (dev+prod TF -> sign -> OTA -> recovery -> channel gate)
+        run: |
+          set -euo pipefail
+          VARIANT="${{ inputs.variant }}"
+          [ -z "$VARIANT" ] && VARIANT=both
+          SYNC_FLAG=""
+          if [ "${{ inputs.sync-first }}" = "true" ]; then SYNC_FLAG=--sync-first; fi
+          bash scripts/nopenix-build.sh --variant "$VARIANT" $SYNC_FLAG
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Build result" >> "$GITHUB_STEP_SUMMARY"
+          for d in /srv/android/ota61/staging/*/; do
+            [ -d "$d" ] || continue
+            echo "### $d" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat "$d/SHA256SUMS" 2>/dev/null || echo "(no artifacts)" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "NOTHING was published — staging only (DoD gate is a human step)." >> "$GITHUB_STEP_SUMMARY"

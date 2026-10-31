@@ -110,8 +110,12 @@ run_variant() {
     else
       export WITH_SU=false
     fi
+    # AOSP envsetup.sh references $TOP before defining it; bash -u would
+    # abort sourcing. Relax nounset for the AOSP build shell only — the
+    # canonical script keeps strict mode outside these subshells.
+    set +u
     source build/envsetup.sh >/dev/null
-    local rel; rel=$(cat vendor/lineage/vars/aosp_target_release)
+    local rel; rel=$(sed -n "s/^aosp_target_release=//p" vendor/lineage/vars/aosp_target_release)
     if [ "$want_userdebug" = 1 ]; then
       lunch "lineage_d2s-$rel-userdebug" >/dev/null
     else
@@ -129,8 +133,9 @@ run_variant() {
   (
     cd "$SRC"
     export TOP="$SRC"
+    set +u   # same nounset relaxation as the TF subshell (envsetup.sh)
     source build/envsetup.sh >/dev/null
-    local rel; rel=$(cat vendor/lineage/vars/aosp_target_release)
+    local rel; rel=$(sed -n "s/^aosp_target_release=//p" vendor/lineage/vars/aosp_target_release)
     if [ "$want_userdebug" = 1 ]; then
       lunch "lineage_d2s-$rel-userdebug" >/dev/null
     else

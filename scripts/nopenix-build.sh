@@ -108,6 +108,11 @@ run_variant() {
   local SLOG="$LOG_DIR/${v}-sign.log"
 
   log "=== variant $v : TF build start (log $VLOG) ==="
+  if [ "$SIGN_ONLY" = 1 ]; then
+    log "variant $v: sign-only, reusing existing TF zip"
+    [ -f "$SRC/out/target/product/d2s/obj/PACKAGING/target_files_intermediates/lineage_d2s-target_files.zip" ] \
+      || die "variant $v: sign-only but no TF zip exists"
+  else
   (
     cd "$SRC"
     export NOPENIX_VARIANT=$v
@@ -129,6 +134,7 @@ run_variant() {
     fi
     m target-files-package
   ) > "$VLOG" 2>&1 || die "variant $v: TF build failed (see $VLOG)"
+  fi
 
   [ "$SKIP_SIGN" = 1 ] && { log "variant $v: skip-sign requested, TF left in out/"; return 0; }
 

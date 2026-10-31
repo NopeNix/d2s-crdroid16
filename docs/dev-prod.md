@@ -25,16 +25,17 @@
 ### Prod line — the daily driver
 
 - **Purpose**: the owner's personal phone — banking apps, real SIM, real data.
-- Base: hardened image **with root: Magisk is installed on prod by design.**
-  - Owner's established, known-good posture from the crDroid 12.9 era: rooted,
-    root hidden with crDroid built-in stealth + Magisk's own hiding
+- ⚠️ **2026-10-30 owner decision — POLICY UPDATE**: Magisk + Zygisk denylist +
+  banking-app root hiding are **OUT OF SCOPE for prod**. The 20261030 prod
+  build runs rootless and passed its full functional gate (call audio green).
+  The rooted-by-design stance below describes the OLD 12.9-era posture and is
+  kept for history — do NOT re-introduce Magisk without a fresh owner decision.
+- Base: hardened image. Historical posture (crDroid 12.9 era, superseded):
+  - Rooted, root hidden with crDroid built-in stealth + Magisk's own hiding
     (Zygisk denylist for banking apps). Banking worked in that state.
-  - Play Integrity is already lost (unlocked bootloader + custom keys) — the
-    marginal cost of Magisk is accepted. Root is NOT seen as contradicting the
-    hardening goal; "full control, full security, full usability" is the target.
+  - Play Integrity is already lost (unlocked bootloader + custom keys).
   - **SELinux stays enforcing** on prod, including with Magisk.
-  - Never publish permissive or rootless variants of prod; the prod image is
-    rooted-by-design.
+  - Never publish permissive variants of prod.
 - Owner **encrypts the device whenever prod is in use** (FBE / standard Android
   disk encryption at first boot with screen lock).
 - Prod builds are identified by `ro.nopenix.variant=prod` and OTA type `release`.
@@ -86,15 +87,15 @@ data. Rules:
   session and again before returning to prod** (clean state, no sensitive data
   on dev, as designed). Owner may explicitly accept a carry-over session.
 - Never publish to prod.json anything built from a dirty/experimental tree.
-- After every prod OTA: Magisk re-patch of the boot image is required (our OTA
-  packages rewrite `boot`). See "Magisk procedure" below. (d2s is non-A/B:
-  dedicated recovery partition; the Updater reboots straight into the new,
-  unrooted boot — re-patch happens right after that reboot.)
+- ⚠️ 2026-10-30: **No Magisk on prod** (owner decision — see policy update above).
+  After a prod OTA the new boot boots rootless by itself: **no Magisk re-patch
+  is required**. The procedure below is retained only as historical reference /
+  for a future owner decision to re-introduce root.
 
-## Magisk procedure (prod)
+## Magisk procedure (prod) — HISTORICAL REFERENCE ONLY (no Magisk on prod, 2026-10-30)
 
-Magisk is NOT baked into the build. The owner installs it on-device once per
-install, and re-patches boot after every OTA:
+Retained in case a future owner decision re-introduces root. Magisk is NOT
+baked into the build. On-device install once per install, re-patch after OTA:
 
 1. **First install** (once, per clean install): install the Magisk APK as a
    normal user app → Magisk → Install → **Direct Install (Recommended)** →
@@ -115,13 +116,13 @@ install, and re-patches boot after every OTA:
 
 ## Definition of done — prod (release gate)
 
-- [ ] Patch level == latest upstream ASB level (or documented gap)
-- [ ] Non-debug internals (no dup-sysprop hooks, SELinux enforcing confirmed)
-- [ ] Magisk installed + Zygisk denylist configured for banking apps
-- [ ] Subsystem checklist green
-- [ ] Owner's banking apps tested; results recorded in `releases/`
-- [ ] OTA JSON published to prod.json; Updater installs it in place
-- [ ] Release note in `releases/` with sha256, patch level, app-test results
+- [x] Patch level == latest upstream ASB level (or documented gap)
+- [x] Non-debug internals (no dup-sysprop hooks, SELinux enforcing confirmed)
+- [x] ~~Magisk installed + Zygisk denylist configured for banking apps~~ **OUT OF SCOPE** (owner decision 2026-10-30 — prod runs without root; checklist template kept for future builds)
+- [x] Subsystem checklist green (owner functional pass 2026-10-30, incl. call audio)
+- [x] ~~Owner's banking apps tested~~ **OUT OF SCOPE** (no Magisk ⇒ no denylist testing applicable)
+- [x] OTA JSON published to prod.json; Updater installs it in place (VERIFIED on device 2026-10-30)
+- [x] Release note in `releases/` with sha256, patch level, app-test results
 
 ## Definition of done — dev (MET 2026-10-28)
 

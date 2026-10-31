@@ -1,9 +1,11 @@
 # Release: nopenix-13.0-20261030 (PROD, first prod build)
 
-> **Status: PUBLISHED to GitHub Releases + `ota/prod.json` (2026-10-30).** The
-> remaining DoD boxes (Magisk + denylist, banking apps, owner functional pass)
-> are still open and tracked below — publish was pulled forward deliberately
-> (owner decision) to exercise the prod OTA chain in-place via the Updater app.
+> **Status: PUBLISHED to GitHub Releases + `ota/prod.json` (2026-10-30).** DoD
+> gate CLOSED 2026-10-30: Setup Wizard done, owner functional pass GREEN
+> (incl. call audio — ABOX watch item benign). Magisk + Zygisk denylist +
+> banking apps OUT OF SCOPE for this build (owner decision 2026-10-30): the
+> 20261030 prod build runs rootless. Note: `docs/dev-prod.md` previously
+> described prod as rooted-by-design — see the dated note there.
 
 ## Build facts
 
@@ -52,20 +54,20 @@
 - Log noise = Setup-Wizard-not-run-yet (provider misses) + transient adbd_auth —
   expected on first boot, clears after setup.
 
-### Watch item (first prod boot)
+### Watch item (first prod boot) — **RESOLVED 2026-10-30**
 
 `audio_hw_proxy: cannot find ABOX Spk AmpL Power Mixer Control` (8×) — proxy
-HAL misses one amplifier mixer control. Media playback routes fine; possible
-impact: speakerphone/in-call volume path. Verify during a call; investigate in
-`exynos9820-common` if in-call audio is off.
+HAL misses one amplifier mixer control. Media playback routes fine. **Owner
+functional pass (2026-10-30) green incl. call audio** — no speakerphone/in-call
+impact; do NOT open an `exynos9820-common` investigation for this.
 
 ## Prod DoD checklist (docs/dev-prod.md) — live tracking
 
 - [x] Patch level == latest upstream ASB (2026-10-01, matches dev line)
 - [x] Non-debug internals (no dup-sysprop hooks, SELinux enforcing confirmed)
-- [ ] Magisk installed + Zygisk denylist configured for banking apps
-- [ ] Subsystem checklist green (owner functional pass incl. call audio watch item)
-- [ ] Owner's banking apps tested; results recorded here
+- [x] ~~Magisk installed + Zygisk denylist configured for banking apps~~ **OUT OF SCOPE** (owner decision 2026-10-30: prod runs without root; no banking-app root hiding needed)
+- [x] Subsystem checklist green (owner functional pass 2026-10-30: call audio GREEN — ABOX watch item benign; BT, camera, GNSS, S-Pen, WiFi/LTE all working)
+- [x] ~~Owner's banking apps tested~~ **OUT OF SCOPE** (no Magisk/denylist ⇒ no banking-app testing applicable)
 - [x] OTA JSON published to prod.json (2026-10-30); in-place OTA install VERIFIED on device (ts 1793395784 build installed via Updater, rebooted clean)
 - [x] GitHub release `nopenix-13.0-20261030` published (zip + recovery.img)
 - [x] Release note (this file)

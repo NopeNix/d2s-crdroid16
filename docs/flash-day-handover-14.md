@@ -1,8 +1,9 @@
 # Flash-Day Handover #14 — 2026-10-30 ~19:30 UTC (READ THIS ONE FIRST)
 
-> Supersedes handover #13. **PROD LINE: FIRST PROD BUILD BUILT, FLASHED, BOOTED.**
-> DoD gate open — Magisk + banking tests pending (§4). Audio detour CLOSED
-> (handover-13); the audio fix is in this prod build.
+> Supersedes handover #13. **PROD LINE: FIRST PROD BUILD BUILT, FLASHED, BOOTED.
+> PROD DoD GATE CLOSED (2026-10-30): Setup Wizard done, functional pass green.
+> Magisk + Zygisk denylist + banking apps OUT OF SCOPE (owner decision). Audio
+> detour CLOSED (handover-13); the audio fix is in this prod build.**
 
 > **⚠️ ADDENDUM (2026-10-30 ~23:00 UTC) — read after this header, before §4:**
 > The §3 prod.json entry and §4 checklist below were overtaken by events the
@@ -15,9 +16,10 @@
 > the NEW build; transition entry removed. New mandatory pre-publish gate:
 > `scripts/verify-ota-channel.sh` (hub) = run-sign-prod.sh stage 5.
 > Full story: `releases/nopenix-13.0-20261030-prod.md` §Updater-channel-fix.
-> **§4 item 5 (publish) is DONE — remaining DoD: Magisk + denylist, owner
-> functional pass (call audio!), banking tests. Item 6's Magisk re-patch
-> applies once Magisk is installed.**
+> **§4 item 5 (publish) is DONE. 2026-10-30 update: functional pass GREEN
+> (incl. call audio), Setup Wizard done. Magisk + Zygisk denylist + banking
+> apps OUT OF SCOPE (owner decision) — §4 item 6's Magisk re-patch never
+> applies; prod OTAs need no boot re-patch.**
 
 ## TL;DR — STATE NOW
 
@@ -29,8 +31,9 @@
   routing active). Build post-timestamp 1793366117, sha256 b8dd62f6…24511.
 - **NOT published yet**: no GitHub release, `ota/prod.json` still empty. That
   is deliberate — prod DoD gate (§4 below) must complete first.
-- One **watch item**: `audio_hw_proxy: cannot find ABOX Spk AmpL Power Mixer
-  Control` — check speakerphone/in-call audio before sign-off.
+- Watch item **RESOLVED**: functional pass (2026-10-30) green incl. call audio.
+  `audio_hw_proxy: cannot find ABOX Spk AmpL Power Mixer Control` is benign —
+  no speakerphone/in-call impact, no `exynos9820-common` investigation needed.
 
 ## 1. What happened this session (prod session #2)
 
@@ -105,22 +108,20 @@
 Release note draft: `releases/nopenix-13.0-20261030-prod.md` (tick the DoD
 boxes as they complete).
 
-## 4. NEXT SESSION — finish the prod DoD gate
+## 4. NEXT SESSION — finish the prod DoD gate — **CLOSED 2026-10-30**
 
-1. **Owner: complete Setup Wizard** on the phone (cuts ~5.5k benign log errors).
-2. **Owner: Magisk Direct Install + Zygisk denylist** for banking apps
-   (docs/dev-prod.md "Magisk procedure"). Verify root + denylist afterwards
-   (banking app test = denylist proof).
-3. **Owner: functional pass** — call audio (esp. speakerphone — the ABOX
-   watch item), BT, camera, GNSS (outdoor), S-Pen, WiFi/LTE speed sanity.
+1. ~~**Owner: complete Setup Wizard**~~ ✅ DONE (phone fully set up).
+2. ~~**Owner: Magisk Direct Install + Zygisk denylist** for banking apps~~
+   **OUT OF SCOPE** (owner decision — no Magisk, no banking-app root hiding).
+3. ~~**Owner: functional pass**~~ ✅ GREEN (2026-10-30) — call audio
+   (speakerphone ABOX watch item resolved, benign), BT, camera, GNSS,
+   S-Pen, WiFi/LTE all working.
 4. **Agent: record results** in `releases/nopenix-13.0-20261030-prod.md`,
    tick DoD boxes.
-5. **Agent: publish** (only when gate green): GitHub release
-   `nopenix-13.0-20261030` with the zip + recovery.img (upload detached:
-   `nohup setsid gh release upload … --clobber > log &`, verify byte-accuracy),
-   append the §3 entry to `ota/prod.json`, push hub main.
-6. Future prod OTAs now flow via Updater in place (chain proven on dev);
-   **remember Magisk re-patch after every prod OTA reboot**.
+5. ~~**Agent: publish**~~ ✅ DONE (GitHub release + ota/prod.json, in-place
+   OTA verified on device — see addendum above).
+6. Future prod OTAs flow via Updater in place (chain proven on dev); ~~Magisk
+   re-patch~~ N/A — no Magisk installed, prod OTAs need no boot re-patch.
 
 ## 5. Rules that bit us this session (already in MEMORY.md, keep applying)
 

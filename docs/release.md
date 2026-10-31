@@ -2,10 +2,10 @@
 
 > Releases follow the **dev/prod policy** (`docs/dev-prod.md`): prod releases must
 > pass `docs/dev-prod.md` §"Definition of done — prod" (current ASB patch level,
-> hardened build + Magisk, subsystem checklist, banking-app test results).
-> Dev builds publish to the dev channel (`ota/dev.json`, type `Nightly`) freely —
-> that is by design; OTA debugging happens on dev. Magisk note: prod OTAs rewrite
-> `boot`, so document the Magisk re-patch step after every prod OTA.
+> hardened rootless build, functional-pass results). **Prod is rootless** (owner
+> decision 2026-10-30: no Magisk). Dev builds publish to the dev channel
+> (`ota/dev.json`, type `Nightly`) freely — that is by design; OTA debugging
+> happens on dev.
 
 1. **Build** per `docs/build-guide.md` (signed per `docs/signing.md`).
 2. **Name**: `nopenix-<dev|prod>-<version>-<YYYYMMDD>-d2s.zip` (e.g.

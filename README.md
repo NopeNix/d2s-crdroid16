@@ -10,8 +10,9 @@ and serves OTA updates to the phone directly.
 
 **Two build lines** (decided 2026-10-26, see `docs/dev-prod.md`): **dev** — an
 open, intentionally insecure playground (userdebug, adb-root) that is the current
-main goal; **prod** — the owner's hardened daily driver with Magisk root and
-encrypted data, banking-app ready. Known limit (both): unlocked bootloader + custom
+main goal; **prod** — the owner's hardened daily driver, rootless (decided
+2026-10-30: no Magisk; banking-app root hiding out of scope), encrypted data.
+Known limit (both): unlocked bootloader + custom
 keys ⇒ Google Play Integrity cannot pass — accepted.
 
 ## Repo map

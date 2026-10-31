@@ -7,10 +7,12 @@ first prod build FLASHED and BOOTED on the phone (2026-10-30), then
 REBUILT with the Updater-channel fix and installed via a real in-place OTA
 (2026-10-30/31)** — the phone is now a prod-channel device. See
 `docs/flash-day-handover-14.md` (+ its addendum) and
-`releases/nopenix-13.0-20261030-prod.md`. Remaining: Magisk + banking tests
-+ owner functional pass.
+`releases/nopenix-13.0-20261030-prod.md`. **DoD gate CLOSED 2026-10-30**:
+Setup Wizard done, functional pass GREEN; Magisk + banking apps OUT OF SCOPE
+(owner decision — prod is rootless).
 Dev = open debug playground (userdebug + debug knobs, adb-root); prod = the
-owner's hardened daily driver WITH Magisk root (Zygisk denylist for banking),
+owner's hardened daily driver, rootless (owner decision 2026-10-30: no Magisk,
+banking-app root hiding out of scope; see docs/dev-prod.md policy update),
 SELinux enforcing, encrypted data; patch level tracks upstream ASB. Known
 limit (both): unlocked bootloader + own keys ⇒ no Google Play Integrity —
 accepted.
@@ -58,9 +60,12 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
       20261029 zip archived as STALE-audio-broken-20261029-d2s.zip
 - [x] Flash dev→prod (userdata wiped, owner-authorized x2 gates), prod booted,
       hardened props verified on device, full log audit clean — handover-14
-- [ ] Magisk Direct Install + Zygisk denylist (owner; also finish Setup Wizard)
-- [ ] Watch item: ABOX Spk AmpL mixer control — verify speakerphone/in-call audio
-- [ ] Subsystem checklist + owner banking-app tests recorded in releases/
+- [x] Magisk Direct Install + Zygisk denylist — **OUT OF SCOPE** (owner decision
+      2026-10-30: prod is rootless); Setup Wizard done
+- [x] Watch item: ABOX Spk AmpL mixer control — RESOLVED, functional pass green
+      (call audio works; error is benign, no exynos9820-common investigation)
+- [x] Subsystem checklist / functional pass GREEN (2026-10-30); banking-app tests
+      OUT OF SCOPE (no Magisk ⇒ no denylist testing applicable)
 - [x] Publish ota/prod.json + GitHub release (buildtype Release) — DONE
       2026-10-30 (twice: first prod zip had the dev channel URL baked; rebuilt
       with the channel fix, republished, verified via a real in-place OTA)

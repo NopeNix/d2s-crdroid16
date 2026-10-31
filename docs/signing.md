@@ -45,11 +45,12 @@ ln -sf releasekey.x509.pem ~/.android-certs/testkey.x509.pem
   future OTA needs another manual sideload (new key = untrusted by installed recovery).
 - Note in each release which key fingerprint signed it.
 
-## Dev/prod stance (2026-10-26, supersedes the earlier "no Magisk" stance)
+## Dev/prod stance (updated 2026-10-30; supersedes the 2026-10-26 "Magisk by design" stance)
 
 - Both lines sign with the SAME Nopenix key set; dev/prod separation is enforced by
   OTA channels + discipline, not signatures (accepted, single-phone project).
 - Own keys + unlocked bootloader ⇒ no Google Play Integrity — accepted.
-- PROD carries Magisk root by design (owner's proven posture: crDroid stealth +
-  Zygisk denylist for banking apps). Prod must NOT carry the flash-day debug hooks
+- **PROD is rootless** (owner decision 2026-10-30: no Magisk, no denylist, no
+  banking-app root hiding). Prod must NOT carry the flash-day debug hooks
   (dup-sysprop escape hatch, adb-root enablement); SELinux stays enforcing.
+  The 2026-10-26 "PROD carries Magisk root by design" stance is historical.

@@ -4,8 +4,9 @@
 > `MEMORY.md` and `docs/flash-day-handover-*.md`.
 
 > **Two variants (docs/dev-prod.md)**: dev = `userdebug` + `BUILD_BROKEN_DUP_SYSPROP=true`
-> (adb-root works, playground). prod = **`user`** flavor + Magisk by design (decided
-> 2026-10-29) — hardened daily driver, `WITH_SU=false`, no debug knobs.
+> (adb-root works, playground). prod = **`user`** flavor, rootless (decided
+> 2026-10-30: no Magisk on prod — banking-app root hiding out of scope) —
+> hardened daily driver, `WITH_SU=false`, no debug knobs.
 > This guide documents the proven debug (dev) flow; the prod-variant deltas are in
 > §5a below.
 
@@ -112,8 +113,10 @@ Deltas from the dev flow:
    `scripts/verify-ota-channel.sh out/signed-target-files.zip prod`** (hub
    repo; wired as `run-sign-prod.sh` stage 5) — it must print `OK` with
    `ota/prod.json` before anything is published.
-4. **Magisk**: NOT in the build — Magisk is installed on-device by the owner
-   (app + Direct Install boot patch). See docs/dev-prod.md "Magisk procedure".
+4. **Magisk**: NOT in the build and NOT installed on prod (owner decision
+   2026-10-30 — prod is rootless; no boot re-patch needed after prod OTAs).
+   The historical "Magisk procedure" in docs/dev-prod.md is retained only as
+   reference for a possible future policy change.
 5. **Publish gate**: prod DoD checklist (docs/dev-prod.md) must be met before
    anything lands in `ota/prod.json`.
 

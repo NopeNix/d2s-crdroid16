@@ -102,8 +102,9 @@ the unpacked zip — installs a package without any user menu steps.)
 > Two channels per docs/dev-prod.md: `ota/dev.json` (type `Nightly`, dev line —
 > published freely, that is the point) and `ota/prod.json` (type `release`, prod
 > line — only after the prod Definition of done). Each build's baked
-> `updater_server_url` RRO points at its channel. Magisk note for prod: OTA
-> rewrites `boot` → Magisk re-patch required before reboot after every prod OTA.
+> `updater_server_url` RRO points at its channel. **Prod is rootless** (owner
+> decision 2026-10-30: no Magisk) — prod OTAs need no boot re-patch; the new
+> boot boots rootless by itself.
 
 1. Build + sign (docs/signing.md, docs/build-guide.md); prod releases use the
    hardened variant, dev releases the debug variant.

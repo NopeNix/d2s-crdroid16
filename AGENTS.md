@@ -11,13 +11,16 @@ continuations only — **no new features**.
 - **DEV line (CURRENT MAIN GOAL)**: userdebug + debug knobs (`BUILD_BROKEN_DUP_SYSPROP`,
   adb-root), intentionally insecure playground, never holds sensitive data. Its OTA
   channel (nightly) IS exercised — OTA debugging happens on dev.
-- **PROD line**: hardened daily driver **with root: Magisk by design** (owner's
-  proven posture: crDroid stealth + Magisk Zygisk denylist for banking apps), SELinux
-  enforcing, owner encrypts the device. Security patch level tracks upstream ASB.
+- **PROD line**: hardened daily driver, **rootless** (owner decision 2026-10-30:
+  Magisk/denylist/banking-app root hiding OUT OF SCOPE; see docs/dev-prod.md
+  policy update), SELinux enforcing, owner encrypts the device. Security patch
+  level tracks upstream ASB.
 - Known limit (both): unlocked bootloader + own keys ⇒ no Google Play Integrity —
   accepted; applies to every custom ROM on this hardware.
-- Sequencing: get dev fully working first (its Definition of done in docs/dev-prod.md);
-  prod work starts only after. Next-session task list: docs/flash-day-handover-13.md (prod line; dev COMPLETE incl. audio, owner-confirmed 2026-10-30).
+- Sequencing: dev COMPLETE (owner-confirmed 2026-10-30). PROD: first build
+  shipped + DoD gate CLOSED 2026-10-30 (Setup Wizard done, functional pass
+  GREEN; Magisk/denylist/banking OUT OF SCOPE — prod is rootless). Next-session
+  task list: docs/flash-day-handover-14.md.
 
 ## Repo layout (hub-and-forks model — IMPORTANT)
 

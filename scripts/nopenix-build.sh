@@ -175,7 +175,7 @@ run_variant() {
     bash "$HUB_DIR/scripts/verify-ota-channel.sh" "$SIGNED" "$v"
   ) > "$SLOG" 2>&1 || die "variant $v: sign failed (see $SLOG)"
 
-  local SIGNED="out/signed-tf-$v.zip" OTA="out/ota-$v.zip" REC="out/signed-tf-x/IMAGES/recovery.img"
+  local SIGNED="$SRC/out/signed-tf-$v.zip" OTA="$SRC/out/ota-$v.zip" REC="$SRC/out/signed-tf-x/IMAGES/recovery.img"
   local ODIR="$ART_DIR/staging/$v"
   mkdir -p "$ODIR"
   # Naming matches the published convention (docs/release.md):

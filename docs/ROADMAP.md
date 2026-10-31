@@ -3,9 +3,12 @@
 **Two build lines (decided 2026-10-26, docs/dev-prod.md): DEV then PROD.**
 **DEV line: COMPLETE and green incl. audio** (nopenix-dev-13.0-20261030
 installed in place via Updater, owner-confirmed 2026-10-30). **PROD line:
-first prod build FLASHED and BOOTED on the phone (2026-10-30)** — see
-`docs/flash-day-handover-14.md` (supersedes 13). Remaining: Magisk + banking
-tests, then publish prod.json.
+first prod build FLASHED and BOOTED on the phone (2026-10-30), then
+REBUILT with the Updater-channel fix and installed via a real in-place OTA
+(2026-10-30/31)** — the phone is now a prod-channel device. See
+`docs/flash-day-handover-14.md` (+ its addendum) and
+`releases/nopenix-13.0-20261030-prod.md`. Remaining: Magisk + banking tests
++ owner functional pass.
 Dev = open debug playground (userdebug + debug knobs, adb-root); prod = the
 owner's hardened daily driver WITH Magisk root (Zygisk denylist for banking),
 SELinux enforcing, encrypted data; patch level tracks upstream ASB. Known
@@ -58,10 +61,11 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
 - [ ] Magisk Direct Install + Zygisk denylist (owner; also finish Setup Wizard)
 - [ ] Watch item: ABOX Spk AmpL mixer control — verify speakerphone/in-call audio
 - [ ] Subsystem checklist + owner banking-app tests recorded in releases/
-- [ ] Publish ota/prod.json + GitHub release (buildtype Release) — entry ready
-      (handover-14 §3), release note drafted (releases/nopenix-13.0-20261030-prod.md)
-
-## Phase 3 — Security-patch cadence 🟪 (routine) — HARD REQUIREMENT for daily driver
+- [x] Publish ota/prod.json + GitHub release (buildtype Release) — DONE
+      2026-10-30 (twice: first prod zip had the dev channel URL baked; rebuilt
+      with the channel fix, republished, verified via a real in-place OTA)
+- [x] Updater-channel fix landed (d2s `88bd604`) + mandatory pre-publish check
+      `scripts/verify-ota-channel.sh` (hub, run-sign-prod.sh stage 5)
 - [ ] Monthly: `repo sync` crDroid 16.0 upstream → rebuild → release (patch-level bump)
 - [ ] Track upstream security merges: crdroidandroid 16.0 branches carry the ASB patches
 - [ ] Watch for crDroid upstream abandoning 16.0 → decide: pin vs. rebase to Lineage 23.2 directly

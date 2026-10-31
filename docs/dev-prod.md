@@ -59,9 +59,15 @@
 - Two JSON files in this repo: `ota/dev.json` (type `nightly` entries) and
   `ota/prod.json` (type `release` entries).
 - Devices point at their channel via the **`updater_server_url` string resource**
-  baked into each line's build as a device-tree overlay RRO (crDroid 16 Updater
-  does NOT read the `lineage.updater.uri` runtime prop — verified 2026-10-26,
-  see `docs/ota.md` + `docs/branding.md`).
+  baked into each line's build through a **channel-specific device-tree overlay**
+  (`overlay/updater/{dev,prod}/…`, selected by `DEVICE_PACKAGE_OVERLAYS` in
+  `nopenix.mk`; crDroid 16 Updater does NOT read the `lineage.updater.uri`
+  runtime prop — verified 2026-10-26, see `docs/ota.md` + `docs/branding.md`).
+  The baked channel is verified before every publish with
+  `scripts/verify-ota-channel.sh <signed-tf> <channel>` (mandatory gate, wired
+  into `run-sign-prod.sh` stage 5; added 2026-10-30 after the first prod build
+  baked the dev URL — root cause: `NOPENIX_OTA_URI` was computed but never
+  consumed).
 - The Updater matches updates by **`timestamp` + `os_sdk_level`** (the JSON
   `version` field is display-only; the channel split is by URI) — verified
   2026-10-26, see `docs/ota.md`.

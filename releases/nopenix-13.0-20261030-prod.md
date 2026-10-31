@@ -98,13 +98,15 @@ New mandatory pre-publish gate: `scripts/verify-ota-channel.sh <signed-tf>
 bakes the intended channel URL; FAILs on mismatch, missing URL, or conflicting
 URLs. It caught both failure modes above before publish.
 
-## OTA install (planned test)
+## OTA install (VERIFIED 2026-10-30/31, on device)
 
-1. Phone (running the stale dev-channel-baked prod build, ts 1793366117)
-   polls `ota/dev.json` → gets offered this build via a temporary dev.json
-   transition entry (same filename/sha/ts 1793395784).
-2. In-place install via Updater (same signing keys; data preserved). NOTE:
-   this OTA's updater binary rewrite does NOT change the phone's baked URL
-   (RRO ships in system/vendor partition) — after reboot the phone runs a
-   build whose baked URL IS prod.json. Transition entry then removed.
-3. From then on the phone is a prod-channel device permanently.
+1. DONE: phone (running the stale dev-channel-baked prod build, ts 1793366117)
+   polled `ota/dev.json`, was offered this build via a temporary dev.json
+   transition entry (same filename/sha/ts 1793395784), installed it via the
+   Updater, rebooted clean.
+2. DONE: post-OTA on-device verification — ts 1793395784 running,
+   `/vendor/overlay/Updater__*.apk` bakes ota/prod.json, 0 crashes/ANRs/
+   tombstones/avc denials, SELinux enforcing, LTE IN_SERVICE (Telekom), audio
+   routing healthy. Data preserved.
+3. DONE: transition entry removed from dev.json. The phone is a
+   prod-channel device permanently.

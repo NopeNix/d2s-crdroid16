@@ -96,8 +96,9 @@ Deltas from the dev flow:
 1. **Wrapper**: `/srv/android/run-tf-prod.sh` (backgrounds `m target-files-package`
    into `/srv/android/tf-prod.log`). It sets:
    - `NOPENIX_VARIANT=prod` → device tree drops `init.debug.rc`, `ro.debuggable`,
-     and `BUILD_BROKEN_DUP_SYSPROP`; `nopenix.mk` points the Updater overlay at
-     `ota/prod.json`; zip names become `nopenix-13.0-<date>-d2s.zip` (no `dev`).
+     and `BUILD_BROKEN_DUP_SYSPROP`; `nopenix.mk` selects the
+     `overlay/updater/prod` Updater overlay (`ota/prod.json`); zip names become
+     `nopenix-13.0-<date>-d2s.zip` (no `dev`).
    - `WITH_SU=false` → no su, no adb_root service.
    - `lunch lineage_d2s-$aosp_target_release-user` (user flavor; decided 2026-10-29).
    - No `WITH_ADB_INSECURE` → adb requires RSA auth (normal secure adb).
@@ -107,7 +108,10 @@ Deltas from the dev flow:
 3. **Post-build verify** (before publishing): from the signed target-files /
    payload props confirm `ro.nopenix.variant=prod`, `ro.secure=1`,
    `ro.debuggable=0`, `ro.adb.secure=1`, SELinux enforcing, and that
-   `SYSTEM/etc/init/init.debug.rc` is ABSENT.
+   `SYSTEM/etc/init/init.debug.rc` is ABSENT. **Also run the channel check:
+   `scripts/verify-ota-channel.sh out/signed-target-files.zip prod`** (hub
+   repo; wired as `run-sign-prod.sh` stage 5) — it must print `OK` with
+   `ota/prod.json` before anything is published.
 4. **Magisk**: NOT in the build — Magisk is installed on-device by the owner
    (app + Direct Install boot patch). See docs/dev-prod.md "Magisk procedure".
 5. **Publish gate**: prod DoD checklist (docs/dev-prod.md) must be met before

@@ -4,11 +4,11 @@ Per docs/dev-prod.md there are two channels:
 
 - `ota/dev.json` — dev line, entries `"type": "nightly"`. Served at
   https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/dev.json
-- `ota/prod.json` — prod line, entries `"type": "release"`. Served at
+- `ota/prod.json` — prod line, entries `"buildtype": "release"`. Served at
   https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/prod.json
-  **Currently EMPTY (`{"response": []}`)** — seeded 2026-10-29 so the prod
-  build's baked-in Updater URL resolves; the first prod build's entry gets
-  appended by the publish pipeline (scripts/ota-json.sh).
+  **First entry published 2026-10-30** (`nopenix-13.0-20261030-d2s.zip`, the
+  channel-fixed prod build, ts 1793395784). NOTE: GitHub's raw CDN caches for
+  ~5 minutes after a push — verify with a wait, not immediately.
 
 IMPORTANT (verified against the crDroid 16 Updater source, 2026-10-26): the new
 Updater does NOT read the `lineage.updater.uri` runtime prop (README-only

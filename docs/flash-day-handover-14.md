@@ -4,6 +4,21 @@
 > DoD gate open — Magisk + banking tests pending (§4). Audio detour CLOSED
 > (handover-13); the audio fix is in this prod build.
 
+> **⚠️ ADDENDUM (2026-10-30 ~23:00 UTC) — read after this header, before §4:**
+> The §3 prod.json entry and §4 checklist below were overtaken by events the
+> same evening. The first prod build baked the DEV channel URL (root cause:
+> `NOPENIX_OTA_URI` computed but never consumed — Updater RRO hardcodes
+> dev.json). Fixed in d2s `88bd604`, prod rebuilt+signed (ts 1793395784, sha
+> e0e7b924…bf993), **verified on device via a real in-place OTA** (offered via
+> a temporary dev.json transition entry, installed, rebooted clean, zero
+> crashes; on-device RRO now bakes prod.json). prod.json + release assets are
+> the NEW build; transition entry removed. New mandatory pre-publish gate:
+> `scripts/verify-ota-channel.sh` (hub) = run-sign-prod.sh stage 5.
+> Full story: `releases/nopenix-13.0-20261030-prod.md` §Updater-channel-fix.
+> **§4 item 5 (publish) is DONE — remaining DoD: Magisk + denylist, owner
+> functional pass (call audio!), banking tests. Item 6's Magisk re-patch
+> applies once Magisk is installed.**
+
 ## TL;DR — STATE NOW
 
 - Phone runs **nopenix prod 13.0, build 20261030** (user flavor, hardened):

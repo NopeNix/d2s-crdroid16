@@ -21,10 +21,17 @@ additive, via props and display strings.
      via `PRODUCT_PRODUCT_PROPERTIES`.
 2. **Updater URL** — crDroid 16 Updater reads the `updater_server_url` string
    resource ONLY (the old `lineage.updater.uri` prop is NOT read). Override via
-   device-tree overlay at
-   `device/samsung/d2s/overlay/packages/apps/Updater/app/src/main/res/values/strings.xml`
-   (dev → `ota/dev.json`, prod → `ota/prod.json`); `PRODUCT_ENFORCE_RRO_TARGETS := *`
-   turns it into the auto-RRO `Updater__aosp_d2s__auto_generated_rro_vendor.apk`.
+   **channel-specific device-tree overlays** (d2s `88bd604`, 2026-10-30):
+   `overlay/updater/dev/packages/apps/Updater/app/src/main/res/values/strings.xml`
+   (→ `ota/dev.json`) and `overlay/updater/prod/...` (→ `ota/prod.json`),
+   selected by `DEVICE_PACKAGE_OVERLAYS` in `nopenix.mk` per `NOPENIX_VARIANT`;
+   `PRODUCT_ENFORCE_RRO_TARGETS := *` turns the override into the auto-RRO
+   `Updater__aosp_d2s__auto_generated_rro_vendor.apk` (vendor partition).
+   Rules: the overlay dir must mirror the package source path, and the baked
+   channel MUST be verified before publish via
+   `scripts/verify-ota-channel.sh` (hub) — the 2026-10-30 prod build shipped
+   with dev.json baked because `NOPENIX_OTA_URI` was computed but never
+   consumed; that variable is gone.
 3. **Zip name** — `LINEAGE_VERSION := nopenix-<dev|prod>-<version>-<date>-d2s`
    reassigned in `device/samsung/d2s/lineage_d2s.mk`. Release naming therefore
    follows `nopenix-dev-13.0-YYYYMMDD-d2s.zip` style.
@@ -45,4 +52,6 @@ additive, via props and display strings.
 > Dev/prod note (2026-10-26): v13.0-dev verified live on device with
 > `ro.nopenix.variant=dev`, `ro.nopenix.version=13.0`, display `v13.0-20261026`,
 > `ro.lineage.build.version=23.2` (handover-9). For prod, the same `nopenix.mk`
-> with `NOPENIX_VARIANT=prod` switches the OTA overlay to `ota/prod.json`.
+> with `NOPENIX_VARIANT=prod` selects the `overlay/updater/prod` Updater
+> overlay (`ota/prod.json`) — verified on device 2026-10-31 (prod phone
+> migrated dev→prod channel via one in-place OTA; see docs/ota.md).

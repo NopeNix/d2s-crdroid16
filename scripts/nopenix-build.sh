@@ -88,6 +88,12 @@ export USE_CCACHE=1
 export CCACHE_DIR
 export SELINUX_IGNORE_NEVERALLOWS=true
 export PATH="$HOME/bin:$PATH"
+# Stable python for releasetools (needs google.protobuf; system python3 lacks it
+# and the runner's PATH must not depend on an interactive uv cache).
+RT_VENV=/srv/android/venv-releasetools
+if [ -x "$RT_VENV/bin/python3" ]; then
+    export PATH="$RT_VENV/bin:$PATH"
+fi
 export TMPDIR=/srv/android/tmp
 mkdir -p "$TMPDIR"
 

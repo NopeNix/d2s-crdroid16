@@ -13,20 +13,6 @@
       "buildtype": "Nightly",
       "os_patch_level": "2026-10-01",
       "os_sdk_level": 36
-    },
-    {
-      "maintainer": "Nopenix",
-      "oem": "Samsung",
-      "device": "Galaxy Note10+",
-      "filename": "nopenix-13.0-20261030-d2s.zip",
-      "download": "https://github.com/NopeNix/d2s-crdroid16/releases/latest/download/nopenix-13.0-20261030-d2s.zip",
-      "sha256": "e0e7b924cb91a56ca4837e883b1764ff81af2fe02a2fa0ec24442573152bf993",
-      "size": 1514693730,
-      "version": "23.2",
-      "os_patch_level": "2026-10-01",
-      "os_sdk_level": 36,
-      "timestamp": 1793395784,
-      "buildtype": "Release"
     }
   ]
 }

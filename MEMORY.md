@@ -3,6 +3,18 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-10-30/31 (PROD OTA EXERCISE COMPLETE) — First prod in-place OTA
+  SUCCEEDED: phone offered new build via TEMP dev.json entry, installed via
+  Updater, rebooted clean. On-device verified: ts 1793395784, variant=prod,
+  /vendor/overlay Updater RRO bakes ota/prod.json (MIGRATION COMPLETE — phone
+  is now a permanent prod-channel device), 0 crashes/ANRs/tombstones/avc,
+  SELinux enforcing, LTE IN_SERVICE Telekom, audio routing healthy. Temp
+  dev.json entry REMOVED (hub pushed). Remaining prod DoD: Magisk install +
+  Zygisk denylist + owner banking/functional pass (esp. call audio / ABOX
+  watch item). NOTE for any future channel migration: phone only re-reads its
+  baked URL after an OTA or reflash — one labeled transition entry on the OLD
+  channel pointing at the new build is the clean migration path (proven).
+
 - 2026-10-30 (channel fix shipped; phone transition staged) — SECOND prod
   build (ts 1793395784, sha e0e7b924...bf993, 1514693730B) built+signed with
   channel fix; verify-ota-channel.sh passed on signed TF (prod URL baked).

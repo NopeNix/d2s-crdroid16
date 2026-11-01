@@ -187,6 +187,15 @@ run_variant() {
   mv -f "$ART_DIR/staging-magisk-work"/Nopenix-magisk-*.zip "$ODIR/"
   rm -rf "$ART_DIR/staging-magisk-work"
 
+  # ROOTED OTA flavor (owner decision 2026-11-01: release matrix is
+  # rootless + rooted per line; the Updater offers both — see docs/dev-prod.md).
+  log "=== variant $v : rooted OTA start ==="
+  bash "$HUB_DIR/scripts/make-rooted-ota.sh" "$SIGNED" "$v" \
+    "$ART_DIR/staging-rooted-work" "$DATE" \
+    || die "variant $v: rooted OTA failed"
+  mv -f "$ART_DIR/staging-rooted-work"/*-ROOTED.zip "$ODIR/"
+  rm -rf "$ART_DIR/staging-rooted-work"
+
   # Naming matches the published convention (docs/release.md):
   #   prod: nopenix-<ver>-<date>-d2s.zip   dev: Nopenix-dev-<ver>-<date>-d2s.zip
   local ZIPNAME

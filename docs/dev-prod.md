@@ -44,6 +44,46 @@
   disk encryption at first boot with screen lock).
 - Prod builds are identified by `ro.nopenix.variant=prod` and OTA type `release`.
 
+## Release matrix (owner decision 2026-11-01 — root persistence across OTA)
+
+> Supersedes the strict "prod is rootless, root only via opt-in magisk zip"
+> reading of 2026-10-30 (which itself superseded the 2026-10-26 rooted-by-design
+> stance). The 2026-10-30 hard requirements that remain untouched: SELinux stays
+> enforcing, no debug knobs in prod, prod OTA JSON stays human-gated.
+
+Every release run now produces this STANDARD artifact matrix:
+
+| Artifact | Prod | Dev |
+|---|---|---|
+| OTA rootless | `nopenix-<ver>-<date>-d2s.zip` | `Nopenix-dev-<ver>-<date>-d2s.zip` |
+| OTA **rooted** | `nopenix-<ver>-<date>-d2s-ROOTED.zip` | `Nopenix-dev-<ver>-<date>-d2s-ROOTED.zip` |
+| recovery | `Nopenix-prod-<ver>-<date>-d2s-recovery.img` | `Nopenix-dev-<ver>-<date>-d2s-recovery.img` |
+| magisk zip (auxiliary) | `Nopenix-magisk-<tag>-prod-<date>-d2s.zip` | same, dev |
+
+- **Rooted OTAs** are normal signed OTA packages whose `IMAGES/boot.img` was
+  Magisk-patched at build time (`scripts/make-rooted-ota.sh` → shared sequence
+  in `scripts/magisk-patch-boot.sh`). Installing the rooted OTA = root that
+  SURVIVES the update; no re-flash per update. Root escapes only via the
+  next OTA that is itself rooted.
+- **Updater offers BOTH flavors** (`ota/prod.json` carries two entries per
+  release; the rooted entry's `version` field carries a `-rooted` suffix so
+  the list is distinguishable). Required device-tree prop:
+  `crdroid.updater.allow_downgrading=true` (d2s fork `7df95c5`, 2026-11-01) —
+  without it the Updater hides entries whose timestamp <= current build,
+  which would break switching flavors in both directions. Channel hygiene:
+  keep ONLY the current release's entries in the channel JSON (2 per line);
+  the allow_downgrading prop makes stale entries visible, so stale entries
+  must be removed, not accumulated.
+- **The magisk zip stays** as the auxiliary path to root an ALREADY-installed
+  rootless build without a full OTA (asset-only, never in channel JSON).
+- **Rootless flavor unchanged**: installing the rootless OTA always yields a
+  rootless system regardless of previous state (the OTA writes a clean boot).
+- **Banking/Play-Integrity posture unchanged**: no Play Integrity either way
+  (unlocked BL); denylist/banking testing remains out of scope until a
+  separate owner decision.
+- Escape hatch: each release also carries the unpatched boot implicitly via
+  the rootless OTA — flashing rootless over rooted is the unroot path.
+
 ## Hard requirements (both lines unless noted)
 
 1. **Security patch level tracks crDroid 16.0 upstream ASB cadence.** Dev carries

@@ -81,6 +81,13 @@ Legend: ⚪ todo · 🟡 in progress · 🟢 done · 🔴 blocked
       crdroidandroid kernel 16.0 branch as-is)
 
 ## Decisions log
+- 2026-11-01: release matrix = rootless + ROOTED OTA per line (+ recovery per
+  line, magisk zip auxiliary). Root persistence across OTA via build-time
+  Magisk-patched boot in the ROOTED OTA (`make-rooted-ota.sh` +
+  `magisk-patch-boot.sh`); Updater offers both flavors via
+  `crdroid.updater.allow_downgrading=true` (d2s fork 7df95c5). Owner decision.
+- 2026-11-01: signed Magisk zip = official workstream (asset-only root path;
+  later narrowed to auxiliary after the rooted-OTA matrix landed same day)
 - 2026-10-04: hub-and-forks repo model (code in forks, docs/manifests here)
 - 2026-10-04: TheMuppets lineage-23.2 blobs default (docs/blob-strategy.md)
 - 2026-10-04: local builds only (GH runners insufficient); releases via GitHub Releases

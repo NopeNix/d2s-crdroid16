@@ -2,4 +2,17 @@
 
 One markdown note per published Nopenix build (nopenix-<version>.md): security patch level, changelog, sha256, link to the GitHub release. Empty until the first build.
 
-Each GitHub release also carries the **signed Magisk zip** (`Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip`, official workstream 2026-11-01): sideloadable from our own recovery on both dev and prod installs, root is opt-in and removed by every OTA (re-sideload after updating). Spec: `docs/proposals/2026-11-01-signed-magisk-zip.md`; never referenced in `ota/*.json`.
+## Standard release asset set (owner decision 2026-11-01)
+
+Every release carries, per line (prod / dev):
+
+- OTA **rootless** (`nopenix-…-d2s.zip` / `Nopenix-dev-…-d2s.zip`)
+- OTA **rooted** (`…-d2s-ROOTED.zip`) — root that SURVIVES updates (build-time
+  Magisk-patched boot). Installing the rootless OTA is the unroot path.
+- `recovery.img` for that line
+- signed Magisk zip `Nopenix-magisk-…-d2s.zip` (auxiliary: root an already
+  installed rootless build without a full OTA; asset-only, never in channels)
+
+The served channel (`ota/prod.json`) carries TWO entries per release — rootless
+and rooted, distinguished by the `-rooted` version suffix; the Updater offers
+both and the user chooses (docs/ota.md §Multiple entries).

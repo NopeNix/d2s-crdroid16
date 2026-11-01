@@ -53,19 +53,16 @@ if [ "$MAGISK_SHA256" = "REPLACE_WITH_SHA256_OF_APK_BEFORE_FIRST_USE" ]; then
 fi
 echo "$MAGISK_SHA256  $APK" | sha256sum -c - || { log "Magisk APK sha256 mismatch — refusing"; exit 1; }
 
-# Patch payload (v31.1 layout — verified 2026-11-01): magiskboot/magiskinit as
-# lib*.so in lib/arm64-v8a/; the magisk binary is libmagisk.so (single-binary
-# layout, no more magisk64/magisk32 split); stub + config injected via
-# assets/boot_patch.sh logic. We replicate the minimal set magiskinit needs.
-BIN="$TOOLCHAIN_DIR/bin"; mkdir -p "$BIN"
+# Patch payload (v31.1 layout — verified 2026-11-01): magiskboot/magiskinit/
+# magisk/init-ld as lib*.so in lib/arm64-v8a/. Single-binary layout (no
+# magisk64/32 split), stub embedded — do NOT look for stub.xz.
+BIN="$TOOLCHAIN_DIR/bin"; MAGISK_LIB="$TOOLCHAIN_DIR/apk/lib/arm64-v8a"
+mkdir -p "$BIN"
 [ -x "$BIN/magiskboot" ] || {
   unzip -qo "$APK" 'lib/arm64-v8a/*' 'assets/*' -d "$TOOLCHAIN_DIR/apk"
-  cp "$TOOLCHAIN_DIR/apk/lib/arm64-v8a/libmagiskboot.so" "$BIN/magiskboot"
-  cp "$TOOLCHAIN_DIR/apk/lib/arm64-v8a/libmagiskinit.so" "$BIN/magiskinit"
-  chmod +x "$BIN/magiskboot" "$BIN/magiskinit"
+  cp "$MAGISK_LIB/libmagiskboot.so"  "$BIN/magiskboot"
+  chmod +x "$BIN/magiskboot"
 }
-# config the patched image expects (magiskinit reads it at boot)
-printf 'KEEPFORCEENCRYPT=true\nKEEPVERITY=true\nRECOVERYMODE=false\n' > "$TOOLCHAIN_DIR/config"
 
 # ------------------------------------------------- extract boot.img ----
 WORK=$(mktemp -d /tmp/magiskzip.XXXXXX)
@@ -73,17 +70,11 @@ trap 'rm -rf "$WORK"' EXIT
 unzip -qo "$TF" 'IMAGES/boot.img' -d "$WORK"
 [ -s "$WORK/IMAGES/boot.img" ] || { log "IMAGES/boot.img missing in TF"; exit 1; }
 
-log "patching boot.img with magiskboot (pinned $MAGISK_TAG)"
-mkdir -p "$WORK/magisk_new"
-cp "$BIN/magiskinit" "$WORK/magisk_new/init.so"
-cp "$TOOLCHAIN_DIR/apk/lib/arm64-v8a/libmagisk.so" "$WORK/magisk_new/magisk"
-cp "$TOOLCHAIN_DIR/apk/assets/stub.xz" "$WORK/magisk_new/stub.xz" 2>/dev/null \
-  || cp "$TOOLCHAIN_DIR/apk/lib/arm64-v8a/libstub.so" "$WORK/magisk_new/stub.xz" \
-  || true   # v31.x embeds the stub inside libmagisk.so; not a separate file
-cp "$TOOLCHAIN_DIR/config" "$WORK/magisk_new/config"
-cp "$WORK/IMAGES/boot.img" "$WORK/boot.img"
-( cd "$WORK" && "$BIN/magiskboot" unpack boot.img >/dev/null \
-  && cp -f magisk_new/config . && "$BIN/magiskboot" repack boot.img new-boot.img >/dev/null )
+log "patching boot.img per assets/boot_patch.sh (pinned $MAGISK_TAG)"
+# Delegates to the shared, single-source-of-truth patch sequence
+# (scripts/magisk-patch-boot.sh) — see that file for the full history.
+export MAGISK_TOOLCHAIN_DIR="$TOOLCHAIN_DIR"
+bash "$HUB_DIR/scripts/magisk-patch-boot.sh" "$WORK" new-boot.img
 
 # ------------------------------------------------- assemble zip ----
 ZIPOUT="$OUTDIR/Nopenix-magisk-$MAGISK_TAG-${VARIANT}-${DATESTAMP}-d2s.zip"

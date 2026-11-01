@@ -8,6 +8,12 @@
 # os_sdk_level }]}. NOT the old Lineage nested files[] array — bare arrays and
 # nested files[] are both rejected by the crDroid 16 Updater.
 # Updater matches entries by timestamp + os_sdk_level, NOT the version field.
+# The version field IS rendered in the Updater list UI (UpdateItemStateMapper:
+# buildVersion = version) — since 2026-11-01 the release matrix per line is
+# rootless + rooted, and the two entries share one build timestamp, so the
+# ROOTED entry's version carries a "-rooted" suffix to be distinguishable in
+# the list (e.g. "23.2-rooted"). Both flavors are always offered thanks to
+# crdroid.updater.allow_downgrading=true (d2s fork 7df95c5).
 set -euo pipefail
 
 ZIP="${1:?usage: ota-json.sh <zip> [version] [buildtype]}"

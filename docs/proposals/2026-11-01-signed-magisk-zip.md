@@ -3,6 +3,13 @@
 > Status: APPROVED by owner 2026-11-01 (supersedes the rootless-only reading of
 > the 2026-10-30 Magisk out-of-scope decision *for this artifact only* — see
 > "Policy resolution" below). Prod ROM builds themselves stay rootless.
+>
+> **2026-11-01 update — role narrowed**: with the rootless+ROOTED OTA matrix in
+> place (owner decision 2026-11-01, docs/dev-prod.md §Release matrix), the
+> rooted OTA is now the PRIMARY root path and the only one that survives
+> updates. This magisk zip remains as the AUXILIARY path: root an
+> already-installed rootless build without a full OTA. All mechanics below
+> still apply.
 
 ## Why
 

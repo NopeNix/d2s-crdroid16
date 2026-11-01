@@ -3,6 +3,19 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (SIGNED MAGISK ZIP = OFFICIAL WORKSTREAM — owner-approved) —
+  Root is now opt-in via `Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip`,
+  sideloadable from OUR recovery (signed with releasekey; both lines share
+  keys → flashable on dev AND prod). Spec:
+  docs/proposals/2026-11-01-signed-magisk-zip.md. Key decisions: prod stays
+  rootless at build time (2026-10-30 intact); zip NEVER referenced in
+  ota/*.json (release-asset only); zip aborts on foreign ROMs, warns on prod;
+  flashing on prod = owner's manual choice. Wired into scripts/nopenix-build.sh
+  (runs per variant, stages next to OTA); new scripts/make-magisk-zip.sh.
+  Magisk pinned v31.1, APK sha256 89cefac0…26ac6e7 (verified 2026-11-01);
+  v31.x layout: single libmagisk.so (no magisk64/32 split), stub embedded.
+  ⚠ EVERY Nopenix OTA removes root (OTA ships unpatched boot.img) — re-sideload
+  matching magisk zip after each update, documented in docs/release.md.
 - 2026-11-01 (owner rules: destructive-op gate + build-always-serve-selectively)
   — OWNER-APPROVED. (1) NEW STANDING RULE (AGENTS.md rule 9): device-destructive
   ops (wipe userdata, format data, etc.) are NEVER pre-authorized by any doc or

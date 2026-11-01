@@ -175,9 +175,18 @@ run_variant() {
     bash "$HUB_DIR/scripts/verify-ota-channel.sh" "$SIGNED" "$v"
   ) > "$SLOG" 2>&1 || die "variant $v: sign failed (see $SLOG)"
 
-  local SIGNED="$SRC/out/signed-tf-$v.zip" OTA="$SRC/out/ota-$v.zip" REC="$SRC/out/signed-tf-x/IMAGES/recovery.img"
+  # Signed Magisk zip (official workstream 2026-11-01): flashable via OUR
+  # recovery on both lines, release-asset only — NEVER referenced in ota/*.json.
+  # Built from the SAME signed TF (boot.img always matches the OTA of this run).
   local ODIR="$ART_DIR/staging/$v"
   mkdir -p "$ODIR"
+  log "=== variant $v : magisk zip start ==="
+  bash "$HUB_DIR/scripts/make-magisk-zip.sh" "$SIGNED" "$v" \
+    "$ART_DIR/staging-magisk-work" "$DATE" \
+    || die "variant $v: magisk zip failed"
+  mv -f "$ART_DIR/staging-magisk-work"/Nopenix-magisk-*.zip "$ODIR/"
+  rm -rf "$ART_DIR/staging-magisk-work"
+
   # Naming matches the published convention (docs/release.md):
   #   prod: nopenix-<ver>-<date>-d2s.zip   dev: Nopenix-dev-<ver>-<date>-d2s.zip
   local ZIPNAME

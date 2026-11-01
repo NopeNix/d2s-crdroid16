@@ -22,6 +22,12 @@
 4. **GitHub Release** on `NopeNix/d2s-crdroid16`:
    - tag: `nopenix-dev-<version>-<date>` (e.g. `nopenix-dev-13.0-20261026`)
    - assets: the ROM zip + `recovery.img` (so users can do the first-flash path)
+     + the signed Magisk zip `Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip`
+     (official workstream 2026-11-01 — built by `scripts/nopenix-build.sh` into
+     staging, spec: `docs/proposals/2026-11-01-signed-magisk-zip.md`. Flashable
+     via our own recovery on BOTH lines; NEVER referenced in ota/*.json.
+     ⚠ **Any OTA removes root** — after each update, re-sideload the matching
+     magisk zip.)
    - body: security patch level, changelog diff vs previous, sha256 of the zip,
      banking-app compatibility test results (prod only)
 5. **Note**: add `releases/nopenix-<version>.md` with the same content for the record,

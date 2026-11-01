@@ -54,3 +54,16 @@ ln -sf releasekey.x509.pem ~/.android-certs/testkey.x509.pem
   banking-app root hiding). Prod must NOT carry the flash-day debug hooks
   (dup-sysprop escape hatch, adb-root enablement); SELinux stays enforcing.
   The 2026-10-26 "PROD carries Magisk root by design" stance is historical.
+
+## Flashable signed Magisk zip (official workstream, owner-approved 2026-11-01)
+
+- `scripts/make-magisk-zip.sh` builds `Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip`
+  from the signed target-files of the same run (boot.img always matches the OTA).
+- Signed with the same **releasekey** (`signapk`, see above) — our recovery
+  accepts it via `adb sideload` on BOTH dev and prod installs (same keys).
+- Flashing on prod is the owner's explicit manual choice (the zip warns on prod,
+  aborts on foreign ROMs). Full spec + safety rails:
+  `docs/proposals/2026-11-01-signed-magisk-zip.md`.
+- NEVER referenced in `ota/dev.json` / `ota/prod.json` — release asset only.
+- Any Nopenix OTA replaces boot.img ⇒ root is gone after every update; the
+  matching magisk zip must be re-sideloaded.

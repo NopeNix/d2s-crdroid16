@@ -25,16 +25,39 @@
    `buildtype` = `Release-Rooted`) — see docs/ota.md §Multiple entries.
    Commit + push to `main`.
 4. **GitHub Release** on `NopeNix/d2s-crdroid16`:
-   - tag: `nopenix-dev-<version>-<date>` (e.g. `nopenix-dev-13.0-20261026`)
-   - assets: the ROM zip (rootless) + the `-ROOTED` OTA zip + `recovery.img`
-     (so users can do the first-flash path) + the signed Magisk zip
-     `Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip` (auxiliary: root an
-     already-installed rootless build without a full OTA — spec:
-     `docs/proposals/2026-11-01-signed-magisk-zip.md`).
-     ⚠ Root persistence: installing the ROOTED OTA keeps root across updates;
-     installing the rootless OTA is the unroot path.
-   - body: security patch level, changelog diff vs previous, sha256 of the zips,
-     banking-app compatibility test results (prod only)
-5. **Note**: add `releases/nopenix-<version>.md` with the same content for the record,
-   including the banking-app test results and the debug-variant confirmation.
+   - tag: `nopenix-<dev|prod>-<version>-<date>` (e.g. `nopenix-13.0-20261031`)
+   - assets, IN THIS ORDER: rootless OTA zip, ROOTED OTA zip, magisk zip,
+     recovery.img.
+   - **body: FIXED FORMAT (owner decision 2026-11-01 — "exactly in this
+     format" for every release; verified on-device the same day when the owner
+     flashed the rooted OTA with zero errors). Template — fill in the
+     <placeholders>; keep structure, wording and line breaks:**
+
+     ```
+     Nopenix <dev|prod> 13.0 build (<YYYY-MM-DD>, ts <TIMESTAMP>) — d2s.
+
+     ASB <SPL>. Rootless by default. **Now offers BOTH flavors** (owner decision 2026-11-01):
+
+     | Asset | What it is |
+     |---|---|
+     | `<rootless ota filename>` | rootless OTA (sha256 `<16-ellipsis-8>`) |
+     | `<rooted ota filename>` | same build + Magisk v31.1-patched boot (sha256 `<16-ellipsis-8>`); root SURVIVES future rooted OTAs. Unroot = install the rootless zip. |
+     | `<magisk zip filename>` | auxiliary magisk zip (root an installed rootless build; every rootless OTA removes root) |
+     | `<recovery img filename>` | Nopenix recovery (accepts releasekey-signed zips) |
+
+     Updater: both flavors appear in `ota/<dev|prod>.json` (`23.2` / `23.2-rooted`);
+     the rooted entry carries timestamp+60 so it stays selectable until the next
+     build ships `crdroid.updater.allow_downgrading=true` (fork 7df95c5).
+
+     ⚠ On-device acceptance tests for the ROOTED zip: <PENDING / DONE + result>.
+     Back up before first install.
+     ```
+
+     Canonical example: release `nopenix-13.0-20261031` (see
+     `releases/nopenix-13.0-20261031-prod.md`). Once a release's acceptance
+     line says DONE, never flip it back. Banking-app test results (prod only)
+     go into the acceptance line once tested.
+5. **Note**: add `releases/nopenix-13.0-<variant>-<date>.md` mirroring the same
+   content for the record, including per-variant details and the acceptance
+   result.
 6. **Verify**: `curl` the raw OTA JSON URL; on the phone run Updater → check.

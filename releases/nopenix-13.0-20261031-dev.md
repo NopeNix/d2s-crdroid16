@@ -29,4 +29,6 @@ workflow live.
   Magisk-patched boot baked in (`scripts/make-rooted-ota.sh`). Root SURVIVES
   future rooted dev OTAs. Unroot = install the rootless zip. Offered in
   `ota/dev.json` as `23.2-rooted` (timestamp+60 until the downgrade prop ships).
-- ⚠ On-device acceptance test for the ROOTED OTA zip itself: PENDING.
+- ⚠ On-device acceptance test for the ROOTED OTA zip itself: prod ROOTED zip
+  DONE on device (owner, zero errors — same patch sequence); dev ROOTED zip
+  itself PENDING (high confidence).

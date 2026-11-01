@@ -83,6 +83,11 @@ Every release run now produces this STANDARD artifact matrix:
   separate owner decision.
 - Escape hatch: each release also carries the unpatched boot implicitly via
   the rootless OTA — flashing rootless over rooted is the unroot path.
+- ✅ 2026-11-01 VERIFIED ON DEVICE: owner flashed the prod ROOTED OTA
+  (`nopenix-13.0-20261031-d2s-ROOTED.zip`) via recovery with zero errors;
+  boots, magiskd root, Magisk app "Installed", su present, SELinux enforcing.
+  The matrix above is the PROVEN standard for new releases.
+  GitHub Release body format is FIXED — see docs/release.md step 4.
 
 ## Hard requirements (both lines unless noted)
 

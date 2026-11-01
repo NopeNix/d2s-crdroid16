@@ -39,6 +39,7 @@
   the Updater lists both flavors. Requires `crdroid.updater.allow_downgrading`
   (d2s fork `7df95c5`) — present from the NEXT build; on the current phone the
   rooted entry carries timestamp+60 so it stays selectable after either install.
-- ⚠ The ROOTED zip on this release was generated from the FIXED pipeline
-  (on-device-verified patch sequence). On-device acceptance test of the rooted
-  OTA itself still PENDING.
+- ✅ **On-device acceptance test DONE (owner, 2026-11-01)**: flashed
+  `nopenix-13.0-20261031-d2s-ROOTED.zip` via recovery with ZERO errors; boots,
+  `magiskd` running as root, Magisk app v31.1 "Installed", `/product/bin/su`
+  present, SELinux Enforcing, incremental `1793461862` = ROOTED build.

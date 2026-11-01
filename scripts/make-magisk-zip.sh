@@ -95,9 +95,13 @@ printf '%s\n' "$MAGISK_TAG" > "$STAGE/magisk_version"
 # update-binary: POSIX shell, run by recovery. Aborts on foreign ROMs; warns
 # on prod; dd's the patched boot over the boot partition.
 cat > "$STAGE/META-INF/com/google/android/update-binary" <<'EOF'
-#!/sbin/sh
+#!/system/bin/sh
 # Nopenix Signed Magisk Zip updater (see docs/proposals/2026-11-01-signed-magisk-zip.md)
-OOB="$1"; ZIP="$2"
+# AOSP recovery invokes: update-binary <api_version> <status_fd> <zip_path>
+# (install.cpp SetUpNonAbUpdateCommands). Our recovery ramdisk has NO /sbin/sh
+# — shebang MUST be /system/bin/sh (toybox); execve'd directly, ENOENT on a bad
+# interpreter shows up as a bare "Installation aborted". (Gotcha 2026-11-01.)
+API="$1"; OOB="$2"; ZIP="$3"
 # recoveries vary; locate the zip payload via the standard ui_print path
 OUTFD=$(readlink /proc/self/fd/"$OOB" 2>/dev/null || true)
 ui_print() { echo "ui_print $1" > /proc/self/fd/"$OOB" 2>/dev/null || echo "$1"; }

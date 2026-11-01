@@ -3,6 +3,21 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (magisk zip SHIPPED in both releases + script gotchas) — First
+  Nopenix-magisk-v31.1-{dev,prod}-20261031-d2s.zip assets live on GitHub
+  (tags nopenix-dev-13.0-20261031 / nopenix-13.0-20261031); signing cert
+  fingerprint verified = releasekey (12:1C:87:C0…:AA). On-device sideload test
+  still PENDING. Script fixes that bit hard: (1) magiskboot/magiskinit from the
+  APK are **aarch64 ELF** — x86_64 build host needs qemu-user-static +
+  binfmt_misc enabled (installed + `echo 1 > /proc/sys/fs/binfmt_misc/status`,
+  sudo via LOCAL_ROOT_PW; registration qemu-aarch64 already present);
+  (2) signapk.jar via plain `java -jar` dies twice: needs
+  `-Djava.library.path=<SRC>/out/host/linux-x86/lib64` (conscrypt) AND
+  `--min-sdk-version 26` (no AndroidManifest in a flashable zip — apksigner
+  verify also can't handle it; verify via openssl on META-INF/CERT.RSA instead);
+  (3) v31.x APK has NO assets/stub.xz (stub embedded in libmagisk.so) and no
+  magisk64/32 split — single libmagisk.so. All fixed in
+  scripts/make-magisk-zip.sh (commit ed74f56).
 - 2026-11-01 (SIGNED MAGISK ZIP = OFFICIAL WORKSTREAM — owner-approved) —
   Root is now opt-in via `Nopenix-magisk-<tag>-<variant>-<date>-d2s.zip`,
   sideloadable from OUR recovery (signed with releasekey; both lines share

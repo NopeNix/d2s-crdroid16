@@ -3,6 +3,13 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (2nd) — RELEASE MATRIX PROVEN + FORMAT LOCKED. Owner flashed the
+  prod ROOTED OTA: zero errors, magiskd root, Magisk Installed, SELinux
+  enforcing. GitHub Release body format is now FIXED ("exactly in this format"
+  — owner's words): title with ts, ASB line, 4-row asset table (rootless OTA /
+  ROOTED OTA / magisk zip / recovery), Updater paragraph, acceptance line.
+  Template lives in docs/release.md step 4; never deviate. Release notes in
+  releases/*.md mirror the same body.
 - 2026-11-01 (RELEASE MATRIX LIVE: rootless + rooted OTA per line)
   - NEVER delete target-files `IMAGES/*.map` — ota_from_target_files
     GetSparseImage REQUIRES them (system/vendor/product maps; boot.img has none).

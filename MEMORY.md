@@ -3,6 +3,16 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (RELEASE MATRIX LIVE: rootless + rooted OTA per line)
+  - NEVER delete target-files `IMAGES/*.map` — ota_from_target_files
+    GetSparseImage REQUIRES them (system/vendor/product maps; boot.img has none).
+    Deleting them = hard assert (cost one 20-min ota build). Fixed + documented.
+  - `scripts/magisk-patch-boot.sh` = THE canonical patch sequence (shared by
+    make-magisk-zip.sh + make-rooted-ota.sh).
+  - Channel JSONs were stale (20261030) while 20261031 releases existed —
+    always append the CURRENT build's entries when publishing.
+  - Rooted entries carry timestamp+60 until `crdroid.updater.allow_downgrading`
+    ships in a build (d2s fork 7df95c5, both branches, pushed).
 - 2026-11-01 (MAGISK ZIP FIRST INSTALL FAILED ON DEVICE — root cause + fix,
   commit c48bf95) — Sideloading v1 magisk zip aborted with "Installation
   aborted", device stayed in recovery. TWO bugs in the generated update-binary:

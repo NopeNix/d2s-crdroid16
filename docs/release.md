@@ -3,9 +3,11 @@
 > Releases follow the **dev/prod policy** (`docs/dev-prod.md`): prod releases must
 > pass `docs/dev-prod.md` §"Definition of done — prod" (current ASB patch level,
 > hardened rootless build, functional-pass results). **Prod is rootless** (owner
-> decision 2026-10-30: no Magisk). Dev builds publish to the dev channel
-> (`ota/dev.json`, type `Nightly`) freely — that is by design; OTA debugging
-> happens on dev.
+> decision 2026-10-30: no Magisk). **2026-11-01 policy — build always, serve
+> selectively**: dev builds publish to GitHub Releases every green run (rescue
+> kit, never build-on-demand), but `ota/dev.json` is NOT a standing channel;
+> dev entries are appended only temporarily during explicit debugging episodes
+> and removed afterwards (see `docs/ota.md`, `docs/dev-prod.md`).
 
 1. **Build** per `docs/build-guide.md` (signed per `docs/signing.md`).
 2. **Name**: `nopenix-<dev|prod>-<version>-<YYYYMMDD>-d2s.zip` (e.g.

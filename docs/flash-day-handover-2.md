@@ -2,6 +2,8 @@
 
 > READ FIRST if you are the next LLM session. Supersedes nothing in
 > docs/flash-day-status.md — read that too, plus MEMORY.md top entries.
+> ⚠️ Historical record: any wipe/format steps below were owner-authorized for
+> THAT session only — never standing instructions (AGENTS.md rule 9, 2026-11-01).
 
 ## Session start state (2026-10-22 ~06:00 UTC)
 - Hub repo /home/user/d2s-crdroid16: unchanged this session. Artifacts verified:

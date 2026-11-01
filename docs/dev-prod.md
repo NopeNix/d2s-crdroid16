@@ -14,9 +14,13 @@
 - Base: `userdebug` + `BUILD_BROKEN_DUP_SYSPROP=true` (the flash-day debug knobs:
   adb-root works, dup-sysprop escape hatch on, `ro.secure` handling per the
   gen_build_prop.py patch in `build/soong/scripts/gen_build_prop.py`).
-- **OTA channel is part of dev**: dev builds ARE published to the dev OTA channel —
-  we must be able to debug Updater/OTA flow on the dev line. (Corrections to the
-  earlier "dev never publishes" idea: wrong, OTA needs dev traffic.)
+- **OTA channel (2026-11-01 policy — build always, serve selectively)**: dev
+  builds are published to GitHub Releases every green pipeline run (rescue kit,
+  never build-on-demand) but are NOT served as a standing `ota/dev.json` channel
+  entry. A dev channel entry is appended only temporarily during an explicit
+  debugging episode and removed afterwards — this is how Updater/OTA flow gets
+  exercised on dev without keeping the userdebug build one accidental tap away
+  from the daily driver. See `docs/ota.md` standing policy.
 - Human-in-the-loop gates are accepted: where a step needs the human (boot to
   recovery, enable adb, accept RSA prompt, tap Allow), the agent asks and the human
   performs it. Everything else is automated.
@@ -72,9 +76,18 @@
 - The Updater matches updates by **`timestamp` + `os_sdk_level`** (the JSON
   `version` field is display-only; the channel split is by URI) — verified
   2026-10-26, see `docs/ota.md`.
-- **Release policy**: dev zips may be published to dev.json freely (that is the
-  point); prod zips go to prod.json + GitHub Releases only after the
-  Definition of done below.
+- **Release policy (2026-11-01 — build always, serve selectively)**: every green
+  pipeline run publishes BOTH lines to GitHub Releases (dev zip + recovery
+  included) so a rescue kit always exists. But only prod gets a `ota/prod.json`
+  channel entry by default — dev is released yet inert, NOT a standing channel.
+  Dev channel entries are appended only temporarily during explicit debugging
+  episodes (see `docs/ota.md`). Rationale: the userdebug dev build must not sit
+  one accidental tap away from the daily driver's banking data, while still
+  being present (never build-on-demand) for a rescue flash over a broken prod.
+- Retention: keep at least the last 2–3 prod builds + their recoveries as
+  GitHub release assets (last-known-good for sideload-back). Disk guards /
+  auto-cleanup apply to local `/srv/android/ota61/` staging only, never to
+  release assets.
 - Naming: dev zips branded `nopenix-dev-*`, prod zips `nopenix-<version>-*`.
 
 ## Single-phone data discipline
@@ -82,8 +95,15 @@
 Dev and prod are software lines; the hardware is one phone that also runs prod's
 data. Rules:
 
+- ⚠️ **Destructive-operation gate (owner rule 2026-11-01)**: docs here may state a
+  *default recommendation*, but they NEVER pre-authorize execution. Every wipe of
+  userdata — including the "wipe before entering dev / before returning to prod"
+  defaults below — requires explicit owner confirmation in that session AND a fresh
+  backup of the current device state (see AGENTS.md rule 9). In-place OTA installs
+  and sideloads do not wipe userdata and need no gate.
 - Before a dev session: confirm with the owner whether userdata is wiped or
-  carried over. Default for the dev line: **wipe userdata on entering a dev
+  carried over. Recommended default for the dev line (a recommendation only, never
+  a pre-authorization — see the gate above): **wipe userdata on entering a dev
   session and again before returning to prod** (clean state, no sensitive data
   on dev, as designed). Owner may explicitly accept a carry-over session.
 - Never publish to prod.json anything built from a dirty/experimental tree.

@@ -3,6 +3,20 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (owner rules: destructive-op gate + build-always-serve-selectively)
+  — OWNER-APPROVED. (1) NEW STANDING RULE (AGENTS.md rule 9): device-destructive
+  ops (wipe userdata, format data, etc.) are NEVER pre-authorized by any doc or
+  default; each occurrence needs explicit owner confirmation in-session + a fresh
+  backup recorded in MEMORY.md first. docs/dev-prod.md "wipe default" is a
+  recommendation only. In-place OTA/sideload needs no gate (doesn't touch userdata).
+  (2) "Build always, serve selectively": every green run builds AND releases BOTH
+  lines + recoveries (never build-on-demand rescue), but only prod.json is served;
+  dev.json entries only temporarily during debugging episodes. Retention floor:
+  last 2–3 prod builds + recoveries on GitHub, never auto-deleted. Owner's fear:
+  LLM silently wiping data on a dev↔prod switch — now blocked by rule. Owner's
+  only backup is still the 12.9 TWRP backup; current prod state NOT backed up yet
+  (flag for next flash/backup session). Owner rejected combined dev+prod updater
+  chooser (userdebug one tap from banking data).
 - 2026-10-31 (UNIFIED BUILD PIPELINE LIVE — runner + canonical script) —
   `scripts/nopenix-build.sh` is THE entry point for both hand-runs and the
   self-hosted Actions runner (label `d2s`, service

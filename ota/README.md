@@ -2,7 +2,10 @@
 
 Per docs/dev-prod.md there are two channels:
 
-- `ota/dev.json` — dev line, entries `"type": "nightly"`. Served at
+- `ota/dev.json` — dev line, entries `"type": "nightly"`. **Not a standing
+  channel** (2026-11-01 policy "build always, serve selectively"): entries are
+  appended only temporarily during explicit debugging episodes and removed
+  afterwards. Dev zips are always on GitHub Releases as the rescue kit.
   https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/dev.json
 - `ota/prod.json` — prod line, entries `"buildtype": "release"`. Served at
   https://raw.githubusercontent.com/NopeNix/d2s-crdroid16/main/ota/prod.json

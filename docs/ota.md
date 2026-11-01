@@ -75,6 +75,15 @@ prod phone migrated dev→prod channel in place):
 3. After reboot the phone runs the new build and polls the new channel.
 4. Remove the temporary entry from the old channel.
 
+**Standing policy (2026-11-01 — "build always, serve selectively")**: `ota/dev.json`
+has NO standing nightly channel. Dev zips are published to GitHub Releases every
+green pipeline run, but a dev channel entry is appended only temporarily during an
+explicit debugging episode (either as the transition-entry above, or as the only
+entry while a dev session is active) and removed afterwards. `ota/prod.json` is the
+only permanently-served channel. Retention: never delete GitHub release assets for
+at least the last 2–3 prod builds + recoveries (last-known-good sideload-back);
+auto-cleanup rules apply only to local `/srv/android/ota61/` staging.
+
 ## Upgrade path: official crDroid 12.9 → first Nopenix build
 
 **Important**: you cannot OTA straight from official 12.9 to our build. The official

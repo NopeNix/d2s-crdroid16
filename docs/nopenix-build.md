@@ -53,9 +53,12 @@ the warm ccache.
 
 ## What it does NOT do
 
-- No publishing to `ota/*.json` and no GitHub Release upload. The runner
-  stages only; the DoD gate + publish remain a human step
-  (`docs/release.md`, `docs/ota.md`).
+- No publishing to `ota/*.json` channel files. The channel stays human-gated.
+  Policy 2026-11-01 ("build always, serve selectively"): dev and prod zips +
+  recoveries are staged every run and may be uploaded to GitHub Releases
+  (rescue kit, retention floor = last 2–3 prod builds + recoveries, never
+  deleted), but channel JSON entries are human steps — dev entries only
+  temporarily during explicit debugging episodes.
 - No auto-wipe of `out/` or `ota61/` (the disk guard refuses to start if
   `/srv` free < 15 GB; prune by hand first).
 

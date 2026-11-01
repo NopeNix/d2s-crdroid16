@@ -8,9 +8,13 @@ continuations only — **no new features**.
 
 ## Two build lines (decided 2026-10-26): DEV and PROD — see docs/dev-prod.md
 
-- **DEV line (CURRENT MAIN GOAL)**: userdebug + debug knobs (`BUILD_BROKEN_DUP_SYSPROP`,
-  adb-root), intentionally insecure playground, never holds sensitive data. Its OTA
-  channel (nightly) IS exercised — OTA debugging happens on dev.
+- **DEV line**: userdebug + debug knobs (`BUILD_BROKEN_DUP_SYSPROP`, adb-root),
+  intentionally insecure playground, never holds sensitive data. Policy
+  2026-11-01 "build always, serve selectively": dev builds ARE published to
+  GitHub Releases every green run (rescue kit — never build-on-demand) but are
+  NOT served as a standing `ota/dev.json` channel entry; a dev channel entry is
+  appended only temporarily during an explicit debugging episode and removed
+  afterwards (see `docs/dev-prod.md`, `docs/ota.md`).
 - **PROD line**: hardened daily driver, **rootless** (owner decision 2026-10-30:
   Magisk/denylist/banking-app root hiding OUT OF SCOPE; see docs/dev-prod.md
   policy update), SELinux enforcing, owner encrypts the device. Security patch
@@ -71,6 +75,18 @@ pushing to its `16.0` (or blob) branch.
 8. **Goal discipline**: security-patch continuation + working OTA only, per the
    dev/prod policy (see above). If a change adds features, flag it to the user and
    get explicit buy-in. Debug-only hacks never ship in prod builds.
+9. **Device-destructive operations are NEVER pre-authorized** (owner rule 2026-11-01,
+   applies to every LLM, no exceptions): wipe userdata, format data, factory reset,
+   partition erase, or any other data-destroying step on the phone is NEVER authorized
+   by any doc, default, or standing policy — not even by the "wipe is the default"
+   language in `docs/dev-prod.md`. Docs state what to *recommend*; they never
+   pre-authorize execution. Every single occurrence requires:
+   (a) explicit owner confirmation in that session, AND
+   (b) a fresh backup of the current device state made first (TWRP backup, or at
+   minimum Smart Switch / Google backup of the current prod state), recorded in
+   MEMORY.md before proceeding. Prefer steps that go through the recovery's own
+   confirmation prompt over one-shot commands that bypass it. In-place OTA installs
+   and sideloads do NOT destroy userdata and do not require this gate.
 
 ## The 60-second orientation for a new session
 

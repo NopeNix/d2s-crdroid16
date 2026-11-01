@@ -134,7 +134,12 @@ printf '# do nothing (all logic is in update-binary)\n' \
 
 log "signing zip with Nopenix releasekey"
 ( cd "$STAGE" && zip -qr "$WORK/unsigned.zip" . )
-java -jar "$SIGNAPK" "$KEYS/releasekey.x509.pem" "$KEYS/releasekey.pk8" \
+# Same invocation releasetools uses (common.py): conscrypt needs
+# -Djava.library.path=<HOST>/lib64 — the plain -jar form dies on
+# UnsatisfiedLinkError (learned 2026-11-01).
+java -Xmx4096m -Djava.library.path="$SRC/out/host/linux-x86/lib64" \
+  -jar "$SIGNAPK" --min-sdk-version 26 \
+  "$KEYS/releasekey.x509.pem" "$KEYS/releasekey.pk8" \
   "$WORK/unsigned.zip" "$ZIPOUT" || { log "signapk failed"; exit 1; }
 
 mkdir -p "$OUTDIR"

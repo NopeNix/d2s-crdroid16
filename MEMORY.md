@@ -3,6 +3,23 @@
 > Rules: Every agent MUST append new gotchas/pitfalls/facts here (no permission needed for
 > appending). Never delete or rewrite existing entries. Date-prefix each entry. Keep it short.
 > Longer write-ups belong in `docs/` (ask permission for those).
+- 2026-11-01 (MAGISK ZIP FIRST INSTALL FAILED ON DEVICE — root cause + fix,
+  commit c48bf95) — Sideloading v1 magisk zip aborted with "Installation
+  aborted", device stayed in recovery. TWO bugs in the generated update-binary:
+  (1) shebang `#!/sbin/sh` — our recovery ramdisk has NO /sbin/sh (only
+  /system/bin/sh toybox); recovery execve()s the binary directly so a bad
+  interpreter = ENOENT before any script line ran. (2) arg order: AOSP recovery
+  calls `update-binary <api_version> <status_fd> <zip_path>` (install.cpp
+  SetUpNonAbUpdateCommands) — old script read OOB=$1 ZIP=$2, so even with a
+  valid shebang it would have failed unzip (fd number ≠ zip path). Both fixed;
+  v2 zips rebuilt + re-signed with new sha256s (dev a17b2ba5…, prod 4e832e9e…),
+  NOT yet re-published to GitHub. Also verified: recovery CAN see
+  ro.nopenix.variant (it's in recovery prop.default = prod), so the variant
+  guard works from recovery. Recovery debugging tip: prod recovery blocks
+  /tmp/recovery.log + last_install from the shell domain (SELinux) and has no
+  su/logcat/dmesg — inspect the recovery ramdisk on the host via
+  `magiskboot cpio ramdisk.cpio exists <entry>` from the unpacked recovery.img
+  instead (that's how /sbin/sh absence was proven).
 - 2026-11-01 (magisk zip SHIPPED in both releases + script gotchas) — First
   Nopenix-magisk-v31.1-{dev,prod}-20261031-d2s.zip assets live on GitHub
   (tags nopenix-dev-13.0-20261031 / nopenix-13.0-20261031); signing cert
